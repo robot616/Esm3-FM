@@ -302,7 +302,6 @@
     </div>
 
     <script>
-        // صور مؤكدة 100% من روابط مباشرة مستقرة
         const categoryImages = {
             "القرآن الكريم | Quran Kareem": "https://images.unsplash.com/photo-1609599006353-e629aaab315d?ixlib=rb-4.0.3&auto=format&fit=crop&w=1920&q=80",
             "إسلاميات | Islamic Programs": "https://images.unsplash.com/photo-1564769625905-50e93615e769?ixlib=rb-4.0.3&auto=format&fit=crop&w=1920&q=80",
@@ -327,7 +326,6 @@
             return categoryImages[categoryStr] || "https://images.unsplash.com/photo-1511671782779-c97d3d27a1d4?ixlib=rb-4.0.3&auto=format&fit=crop&w=1920&q=80";
         }
 
-        // ترجمة احترافية لكل الأسماء
         function formatStationName(rawName) {
              const translations = {
                  "Rawe3 El Telwat FM": "روائع التلاوات",
@@ -542,7 +540,6 @@
              return cleanName;
         }
 
-        // القائمة الكاملة كما طلبتها بالضبط
         const rawM3U = `
 #EXTM3U
 
@@ -1048,7 +1045,7 @@ http://stream.zeno.fm/ktcdkm8w1qruv.mp3
         let mpegtsInstance = null;
 
         function renderSidebar() {
-            mainBg.style.backgroundImage = \`url('\${getBgImage("منوعات | Mix Radio")}')\`;
+            mainBg.style.backgroundImage = `url('${getBgImage("منوعات | Mix Radio")}')`;
 
             Object.keys(parsedData).forEach((cat) => {
                 const stations = parsedData[cat];
@@ -1057,7 +1054,7 @@ http://stream.zeno.fm/ktcdkm8w1qruv.mp3
                 
                 const header = document.createElement('div');
                 header.className = 'accordion-header';
-                header.innerHTML = \`<span>\${cat} <small style="opacity:0.5; font-size:0.8em">(\${stations.length})</small></span> <i class="fas fa-chevron-down"></i>\`;
+                header.innerHTML = `<span>${cat} <small style="opacity:0.5; font-size:0.8em">(${stations.length})</small></span> <i class="fas fa-chevron-down"></i>`;
                 
                 const content = document.createElement('div');
                 content.className = 'accordion-content';
@@ -1065,7 +1062,7 @@ http://stream.zeno.fm/ktcdkm8w1qruv.mp3
                 stations.forEach(station => {
                     const card = document.createElement('div');
                     card.className = 'station-card';
-                    card.innerHTML = \`<h3>\${station.name}</h3> <i class="fas fa-play play-icon"></i>\`;
+                    card.innerHTML = `<h3>${station.name}</h3> <i class="fas fa-play play-icon"></i>`;
                     card.onclick = () => playStation(station, card);
                     content.appendChild(card);
                 });
@@ -1093,7 +1090,7 @@ http://stream.zeno.fm/ktcdkm8w1qruv.mp3
             mainStatusText.textContent = "جاري الاتصال...";
 
             const bgUrl = getBgImage(station.category);
-            mainBg.style.backgroundImage = \`url('\${bgUrl}')\`;
+            mainBg.style.backgroundImage = `url('${bgUrl}')`;
 
             if (currentPlayingCard) {
                 currentPlayingCard.classList.remove('playing');
@@ -1152,11 +1149,10 @@ http://stream.zeno.fm/ktcdkm8w1qruv.mp3
             playIcon.className = 'fas fa-play';
             mainStatusText.textContent = "فشل التشغيل";
             
-            // إضافة توضيح لسبب الخطأ (خاصة حماية المتصفح)
             if (window.location.protocol === 'https:' && audioPlayer.src.startsWith('http://')) {
-                errorMsg.innerHTML = "🚫 <b>حظر أمني:</b> المتصفح يمنع تشغيل هذه المحطة لأن رابطها (http) غير آمن. <br>الحل: انقر على علامة <b>القفل</b> بجوار الرابط أعلى المتصفح، ثم اختر <b>Site Settings (إعدادات الموقع)</b>، واسمح بـ <b>Insecure Content (محتوى غير آمن)</b>.";
+                errorMsg.innerHTML = "🚫 <b>حظر أمني:</b> المتصفح يمنع تشغيل المحطة لأن رابطها غير آمن. <br>اسمح بـ <b>Insecure Content</b> من إعدادات المتصفح.";
             } else {
-                errorMsg.textContent = "تعذر الاتصال بالمحطة، ربما البث متوقف مؤقتاً من المصدر.";
+                errorMsg.textContent = "تعذر الاتصال بالمحطة، ربما البث متوقف من المصدر.";
             }
             
             errorMsg.style.display = 'block';
