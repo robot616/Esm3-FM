@@ -3,9 +3,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Esma3 Fm | راديو احترافي</title>
+    <title>Esma3 Fm</title>
     
-    <link rel="icon" href="https://cdn-icons-png.flaticon.com/512/3255/3255157.png" type="image/png">
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512'><rect width='512' height='512' rx='112' fill='%2305080a'/><path d='M128 256v128h64V256h-64zm106.7-128v256h64V128h-64zm106.6 64v192h64V192h-64z' fill='%2300f2fe'/><text x='256' y='460' font-family='Arial' font-size='60' font-weight='bold' fill='%23ffffff' text-anchor='middle'>Esma3</text></svg>">
     
     <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;700;900&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
@@ -16,10 +16,9 @@
         :root {
             --primary: #00f2fe;
             --secondary: #4facfe;
-            --sidebar-bg: #111820; /* لون داكن أنيق للقائمة */
+            --sidebar-bg: #111820;
             --card-bg: rgba(255, 255, 255, 0.05);
             --text-main: #ffffff;
-            --text-muted: #a0aab5;
         }
 
         * {
@@ -36,19 +35,18 @@
             overflow: hidden; 
         }
 
-        /* تعديل التخطيط: القائمة على الشمال */
         .app-container {
             display: flex;
             width: 100%;
             height: 100%;
-            flex-direction: row-reverse; /* هذا السطر ينقل القائمة لليسار في وضع RTL */
+            flex-direction: row-reverse; /* القائمة على اليسار */
         }
 
-        /* الشريط الجانبي (القائمة اللي على الشمال) */
+        /* الشريط الجانبي */
         .sidebar {
-            width: 320px;
+            width: 330px;
             background-color: var(--sidebar-bg);
-            border-right: 1px solid rgba(255, 255, 255, 0.1); /* فاصل رقيق */
+            border-right: 1px solid rgba(255, 255, 255, 0.1);
             display: flex;
             flex-direction: column;
             height: 100%;
@@ -69,7 +67,7 @@
             background: -webkit-linear-gradient(var(--primary), var(--secondary));
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
-            letter-spacing: 1px;
+            letter-spacing: 2px;
         }
 
         .categories-container {
@@ -78,7 +76,6 @@
             padding: 15px;
         }
 
-        /* تنسيق شريط التمرير */
         .categories-container::-webkit-scrollbar { width: 5px; }
         .categories-container::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.2); border-radius: 10px; }
 
@@ -132,9 +129,9 @@
             background: rgba(0, 242, 254, 0.08);
         }
         .station-card.playing .play-icon { color: var(--primary); }
-        .station-card h3 { font-size: 0.9rem; font-weight: normal; }
+        .station-card h3 { font-size: 0.85rem; font-weight: normal; line-height: 1.4; }
 
-        /* المنطقة الرئيسية (الخلفية بالكامل) */
+        /* المنطقة الرئيسية والخلفية */
         .main-player {
             flex: 1;
             position: relative;
@@ -144,39 +141,39 @@
             background-color: #05080a;
             background-size: cover;
             background-position: center;
-            transition: background-image 0.8s ease-in-out; /* حركة ناعمة عند تغيير الصورة */
+            transition: background-image 0.8s ease-in-out;
         }
 
-        /* طبقة تظليل سوداء فوق الصورة عشان الكلام يبان */
         .overlay {
             position: absolute;
             top: 0; left: 0; right: 0; bottom: 0;
-            background: linear-gradient(to top, rgba(0,0,0,0.9) 0%, rgba(0,0,0,0.4) 100%);
+            background: linear-gradient(to top, rgba(0,0,0,0.95) 0%, rgba(0,0,0,0.5) 100%);
             z-index: 1;
         }
 
-        /* اللوحة الزجاجية اللي فيها المشغل واسم الإذاعة */
+        /* اللوحة الزجاجية */
         .glass-panel {
             position: relative;
             z-index: 2;
-            background: rgba(15, 23, 30, 0.6);
-            backdrop-filter: blur(15px);
-            -webkit-backdrop-filter: blur(15px);
+            background: rgba(15, 23, 30, 0.65);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
             border: 1px solid rgba(255, 255, 255, 0.1);
             border-radius: 30px;
             padding: 50px;
             text-align: center;
-            width: 80%;
-            max-width: 600px;
-            box-shadow: 0 20px 50px rgba(0,0,0,0.5);
+            width: 85%;
+            max-width: 650px;
+            box-shadow: 0 20px 50px rgba(0,0,0,0.6);
         }
 
         .player-info h3 {
-            font-size: 2.5rem;
+            font-size: 1.8rem;
             color: #ffffff;
             margin-bottom: 10px;
             text-shadow: 0 4px 10px rgba(0,0,0,0.5);
-            font-weight: 900;
+            font-weight: 700;
+            line-height: 1.5;
         }
 
         .player-info p {
@@ -233,11 +230,12 @@
             position: absolute;
             top: 20px;
             right: 20px;
-            font-size: 2rem;
+            font-size: 2.5rem;
             color: white;
             z-index: 100;
             background: none;
             border: none;
+            text-shadow: 0 2px 10px rgba(0,0,0,0.8);
         }
 
         @media (max-width: 900px) {
@@ -251,7 +249,7 @@
             }
             .sidebar.show { left: 0; }
             .glass-panel { width: 95%; padding: 30px 20px; }
-            .player-info h3 { font-size: 1.8rem; }
+            .player-info h3 { font-size: 1.4rem; }
         }
     </style>
 </head>
@@ -261,7 +259,7 @@
         
         <aside class="sidebar" id="sidebar">
             <div class="sidebar-header">
-                <h2>Esm3 Fm</h2>
+                <h2>Esma3 Fm</h2>
             </div>
             <div class="categories-container" id="categoriesContainer">
                 </div>
@@ -274,9 +272,9 @@
             
             <div class="glass-panel">
                 <div class="player-info">
-                    <h3 id="mainStationName">اختر إذاعة للبدء</h3>
-                    <p id="mainStatusText">جاهز للتشغيل</p>
-                    <p id="errorMsg">الإذاعة لا تستجيب، تأكد من اتصالك أو إعدادات الحماية</p>
+                    <h3 id="mainStationName">Esma3 Fm</h3>
+                    <p id="mainStatusText">اختر إذاعة للبدء</p>
+                    <p id="errorMsg">الإذاعة لا تستجيب، تأكد من اتصالك</p>
                 </div>
 
                 <div class="main-controls">
@@ -300,7 +298,7 @@
     </div>
 
     <script>
-        // قاموس الأسماء
+        // قاموس أسماء الأقسام
         const categoryNames = {
             "Quran Kreem Radio": "القرآن الكريم | Quran Kareem",
             "Isalam Radio": "إسلاميات | Islamic Programs",
@@ -311,19 +309,199 @@
             "Sports Radio": "رياضة | Sports"
         };
 
-        // صور لكل قسم عشان الخلفية تكون احترافية (روابط من Unsplash بجودة عالية)
-        const categoryImages = {
-            "القرآن الكريم | Quran Kareem": "https://images.unsplash.com/photo-1584227376378-0130f146a4e3?q=80&w=1920", // صورة مصحف/مسجد
-            "إسلاميات | Islamic Programs": "https://images.unsplash.com/photo-1564769625905-50e93615e769?q=80&w=1920", // عمارة إسلامية
-            "منوعات | Mix Radio": "https://images.unsplash.com/photo-1511671782779-c97d3d27a1d4?q=80&w=1920", // مايكروفون
-            "أغاني | Songs": "https://images.unsplash.com/photo-1493225457124-a1a2a5f56468?q=80&w=1920", // حفلة/موسيقى
-            "مطربين | Singers": "https://images.unsplash.com/photo-1516280440502-6c245c3b9991?q=80&w=1920", // مغني ومايك
-            "ثقافة ودراما | Drama": "https://images.unsplash.com/photo-1478720568477-152d9b164e26?q=80&w=1920", // دراما/سينما
-            "رياضة | Sports": "https://images.unsplash.com/photo-1518605368461-1ed152815949?q=80&w=1920", // ملعب رياضي
-            "Default": "https://images.unsplash.com/photo-1511671782779-c97d3d27a1d4?q=80&w=1920"
-        };
+        // دالة ذكية لاختيار صورة الخلفية بناءً على الكلمات المفتاحية في اسم القسم
+        function getBgImage(categoryStr) {
+            if (categoryStr.includes('القرآن')) return 'https://images.unsplash.com/photo-1584227376378-0130f146a4e3?q=80&w=1920';
+            if (categoryStr.includes('إسلاميات')) return 'https://images.unsplash.com/photo-1564769625905-50e93615e769?q=80&w=1920';
+            if (categoryStr.includes('أغاني')) return 'https://images.unsplash.com/photo-1493225457124-a1a2a5f56468?q=80&w=1920';
+            if (categoryStr.includes('مطربين')) return 'https://images.unsplash.com/photo-1516280440502-6c245c3b9991?q=80&w=1920';
+            if (categoryStr.includes('ثقافة')) return 'https://images.unsplash.com/photo-1478720568477-152d9b164e26?q=80&w=1920';
+            if (categoryStr.includes('رياضة')) return 'https://images.unsplash.com/photo-1518605368461-1ed152815949?q=80&w=1920';
+            return 'https://images.unsplash.com/photo-1511671782779-c97d3d27a1d4?q=80&w=1920'; // صورة افتراضية للمنوعات
+        }
 
-        // الداتا الخاصة بك
+        // دالة لترجمة أسماء الإذاعات المدمجة في ملفك
+        function formatStationName(rawName) {
+             const translations = {
+                 "Rawe3 El Telwat FM": "روائع التلاوات",
+                 "Beautiful Recitations": "تلاوات رائعة",
+                 "Quran for the Heart Radio": "قرآن للقلب",
+                 "Surah Al-Baqarah Many Reciters": "سورة البقرة - قراء متعددون",
+                 "Roqea": "الرقية الشرعية",
+                 "Sakeenah": "السكينة",
+                 "Mishary Alafasi": "مشاري العفاسي",
+                 "Maher Al Meaqli": "ماهر المعيقلي",
+                 "Islam Sobhi": "إسلام صبحي",
+                 "Ibrahim Al-Akdar": "إبراهيم الأخضر",
+                 "Abu Bakr Al Shatri": "أبو بكر الشاطري",
+                 "Ahmad Al-Ajmy": "أحمد العجمي",
+                 "Ahmad Al-Hawashi": "أحمد الحواشي",
+                 "Ahmad Saber": "أحمد صابر",
+                 "Ahmad Nauina": "أحمد نعينع",
+                 "Akram Alalaqmi": "أكرم العلاقمي",
+                 "Idrees Abkr": "إدريس أبكر",
+                 "Alzain Mohammad Ahmad": "الزين محمد أحمد",
+                 "Al-Qaria Yassen": "القارئ ياسين",
+                 "Aloyoon Al-Koshi": "العيون الكوشي",
+                 "Tawfeeq As-Sayegh": "توفيق الصايغ",
+                 "Jamal Shaker Abdullah": "جمال شاكر عبدالله",
+                 "Khaled Al-Qahtani": "خالد القحطاني",
+                 "Khalid Abdulkafi": "خالد عبدالكافي",
+                 "Khalifa Altunaiji": "خليفة الطنيجي",
+                 "Saad Al-Ghamdi": "سعد الغامدي",
+                 "Saud Al-Shuraim": "سعود الشريم",
+                 "Sahl Yassin": "سهل ياسين",
+                 "Zaki Daghistani": "زكي داغستاني",
+                 "Sayeed Ramadan": "سيد رمضان",
+                 "Shirazad Taher": "شيرزاد طاهر",
+                 "Saber Abdulhakm": "صابر عبدالحكم",
+                 "Salah Albudair": "صلاح البدير",
+                 "Salah Alhashim": "صلاح الهاشم",
+                 "Slaah Bukhatir": "صلاح بو خاطر",
+                 "Khalid Almohana": "خالد المهنا",
+                 "Adel Ryyan": "عادل ريان",
+                 "Abdelbari Al-Toubayti": "عبدالباري الثبيتي",
+                 "Abdulbari Mohammad": "عبدالباري محمد",
+                 "Abdulbasit Abdulsamad": "عبدالباسط عبدالصمد",
+                 "Abdulrahman Alsudaes": "عبدالرحمن السديس",
+                 "Abdul Aziz Al-Ahmad": "عبدالعزيز الأحمد",
+                 "Abdullah Al-Mattrod": "عبدالله المطرود",
+                 "Abdullah Basfer": "عبدالله بصفر",
+                 "Abdullah Khayyat": "عبدالله خياط",
+                 "Abdullah Al-Johany": "عبدالله الجهني",
+                 "Abdulrasheed Soufi": "عبدالرشيد صوفي",
+                 "Abdulmohsin Al-Harthy": "عبدالمحسن الحارثي",
+                 "Abdulmohsen Al-Qasim": "عبدالمحسن القاسم",
+                 "Abdulmohsin Al-Obaikan": "عبدالمحسن العبيكان",
+                 "Abdulhadi Kanakeri": "عبدالهادي كناكري",
+                 "Abdulwadood Haneef": "عبدالودود حنيف",
+                 "Ali Alhuthaifi": "علي الحذيفي",
+                 "Ali Jaber": "علي جابر",
+                 "Ali Hajjaj Alsouasi": "علي حجاج السويسي",
+                 "Emad Hafez": "عماد حافظ",
+                 "Mousa Bilal": "موسى بلال",
+                 "Omar Al-Qazabri": "عمر القزابري",
+                 "Fares Abbad": "فارس عباد",
+                 "Nasser Alqatami": "ناصر القطامي",
+                 "Nabil Al Rifay": "نبيل الرفاعي",
+                 "Neamah Al-Hassan": "نعمة الحسان",
+                 "Hani Arrifai": "هاني الرفاعي",
+                 "Waleed Alnaehi": "وليد النايحي",
+                 "Yasser Al-Dosari": "ياسر الدوسري",
+                 "Yasser Al-Qurashi": "ياسر القرشي",
+                 "Yasser Al-Mazroyee": "ياسر المزروعي",
+                 "Yahya Hawwa": "يحيى حوى",
+                 "Yousef Alshoaey": "يوسف الشويعي",
+                 "Mohammad Al-Tablaway": "محمد الطبلاوي",
+                 "Mohammed Al-Lohaidan": "محمد اللحيدان",
+                 "Mohammed Ayyub": "محمد أيوب",
+                 "Mohammed Jibreel": "محمد جبريل",
+                 "Mohammed Siddiq Al-Minshawi": "محمد صديق المنشاوي",
+                 "Mahmoud Khalil Al-Hussary": "محمود خليل الحصري",
+                 "Mahmoud Ali  Albanna": "محمود علي البنا",
+                 "Mustafa Ismail": "مصطفى إسماعيل",
+                 "Mustafa Al-Lahoni": "مصطفى اللاهوني",
+                 "Mustafa raad Alazawy": "مصطفى رعد العزاوي",
+                 "Muftah Alsaltany": "مفتاح السلطني",
+                 "Hatem Fareed Alwaer": "حاتم فريد الواعر",
+                 "Adel Al-Khalbany": "عادل الكلباني",
+                 "Ibrahim Aldosari": "إبراهيم الدوسري",
+                 "Jamaan Alosaimi": "جمعان العصيمي",
+                 "Ahmed Amer": "أحمد عامر",
+                 "Elazaa 3ama": "إذاعة عامة",
+                 "Main Radio": "الإذاعة الرئيسية",
+                 "Fatwai": "فتاوى",
+                 "Nurun Ala Nur": "نور على نور",
+                 "Quran for the Soul": "قرآن للروح",
+                 "Sirah": "السيرة النبوية",
+                 "Allahu Akbar": "الله أكبر",
+                 "El-shaarawy": "الشعراوي",
+                 "Elsha3rawy 2": "الشعراوي ٢",
+                 "SALAM FM": "سلام إف إم",
+                 "El Fajer fm": "راديو الفجر",
+                 "Melody Arabia": "ميلودي عربية",
+                 "Colors FM": "كلرز إف إم",
+                 "N0G0MElm7ta": "نجوم المحطة",
+                 "Radio tone": "راديو تون",
+                 "Anghami Fm": "أنغامي إف إم",
+                 "Solly Radio": "سولي راديو",
+                 "Arab Mix FM": "عرب ميكس",
+                 "Masr 2030": "مصر 2030",
+                 "Eg On Air": "إيجي أون إير",
+                 "Cairo Up": "كايرو أب",
+                 "Alayam Radio": "راديو الأيام",
+                 "Arabic Mood": "أرابيك مود",
+                 "Men Radio Fm": "مين راديو",
+                 "Egyptian Rap": "راب مصري",
+                 "Marwan Pablo": "مروان بابلو",
+                 "SaSa remix": "ساسا ريمكس",
+                 "Mhrgan": "مهرجانات",
+                 "Arabica": "أرابيكا",
+                 "Nasaaem Syria": "نسائم سوريا",
+                 "Radio Star Lb Fm": "راديو ستار لبنان",
+                 "Aghani Aghani": "أغاني أغاني",
+                 "Radio Angham": "راديو أنغام",
+                 "Ahl Al Qaseed Fm": "أهل القصيد",
+                 "MIX FM KSA": "ميكس إف إم السعودية",
+                 "MBC Mood Radio": "إم بي سي مود",
+                 "cassette-araby": "كاسيت عربي",
+                 "90s Fm": "تسعينات إف إم",
+                 "Days Old FM live": "أيام زمان",
+                 "Radio Naim Halawi": "نعيم حلاوي",
+                 "Mood Fm": "مود إف إم",
+                 "ABC Alhaan Zaman": "ألحان زمان",
+                 "Alhaan Radio": "راديو ألحان",
+                 "umm-kulthum": "أم كلثوم",
+                 "Umm Kulthum 2": "أم كلثوم ٢",
+                 "Kawkab elshar8": "كوكب الشرق",
+                 "AbdelHalim Hafez": "عبدالحليم حافظ",
+                 "Mohammed Abdel Wahab": "محمد عبدالوهاب",
+                 "Fayroz": "فيروز",
+                 "Radio Fairouziat": "فيروزيات",
+                 "Naghm Fayroz": "نغم فيروز",
+                 "Diab FM": "دياب إف إم",
+                 "AMR DIAB FM": "عمرو دياب إف إم",
+                 "Radio Diab online": "راديو دياب",
+                 "Radio Elissa": "راديو إليسا",
+                 "Mohmmed Mohy": "محمد محيي",
+                 "Maher Zain": "ماهر زين",
+                 "Sheikh Yassin Tohami": "الشيخ ياسين التهامي",
+                 "ahmed altuni": "أحمد التوني",
+                 "Tabeb Radio": "راديو طبيب",
+                 "mostafa-mahmoud": "مصطفى محمود",
+                 "Ahmed Khaled tawfek": "أحمد خالد توفيق",
+                 "Arab Mix Drama": "عرب ميكس دراما",
+                 "Radio-hky": "راديو حكي",
+                 "WINZY FM RADIO": "وينزي إف إم",
+                 "klmteen we bas": "كلمتين وبس",
+                 "abla fadela": "أبلة فضيلة",
+                 "OnSportFM": "أون سبورت",
+                 "Radio Mars": "راديو مارس",
+                 "U Fm Radio": "يو إف إم",
+                 "BeiN 1": "بي إن سبورت 1",
+                 "BeiN 2": "بي إن سبورت 2",
+                 "BeiN 3": "بي إن سبورت 3",
+                 "BeiN 4": "بي إن سبورت 4",
+                 "BeiN 5": "بي إن سبورت 5",
+                 "BeiN 6": "بي إن سبورت 6",
+                 "BeiN 7": "بي إن سبورت 7",
+                 "FoX FM 1": "فوكس إف إم 1",
+                 "Anis FM 1": "أنيس إف إم 1",
+                 "Yahia 1": "يحيى 1",
+                 "Aswat AlWeb": "أصوات الويب"
+             };
+             
+             let cleanName = rawName.replace(/_/g, ' ').trim();
+             // للتعامل مع التكرار في الأسماء زي (Abdulbasit Abdulsamad 1)
+             let baseName = cleanName.replace(/\s*\d+$/, '').trim(); 
+             let arName = translations[cleanName] || translations[baseName];
+             
+             if (arName) {
+                 return `${arName} | ${cleanName}`;
+             }
+             return cleanName;
+        }
+
         const rawM3U = `
 #EXTM3U
 Quran Kreem Radio
@@ -794,17 +972,19 @@ http://stream.zeno.fm/ktcdkm8w1qruv.mp3
                     if (!parsedData[currentCategory]) parsedData[currentCategory] = [];
                 } else if (line.startsWith('#EXTINF')) {
                     const parts = line.split(',');
-                    tempName = parts.length > 1 ? parts.slice(1).join(',').replace(/_/g, ' ') : 'محطة غير معروفة';
+                    if (parts.length > 1) {
+                        // استخراج الاسم وتمريره لدالة الترجمة الاحترافية
+                        let rawStation = parts.slice(1).join(',');
+                        tempName = formatStationName(rawStation);
+                    } else {
+                        tempName = 'محطة غير معروفة';
+                    }
                 } else if (line.startsWith('http')) {
                     if (tempName) {
-                        // تنظيف الرابط من الرموز التي توقف المشغل مثل # في اخر FoxFm
                         let finalUrl = line.split('#')[0]; 
-                        
-                        // محاولة ترقية روابط mp3quran لـ https لأنها مدعومة
                         if(finalUrl.startsWith('http://live.mp3quran.net')) {
                             finalUrl = finalUrl.replace('http://', 'https://');
                         }
-                        
                         if (!parsedData[currentCategory]) parsedData[currentCategory] = [];
                         parsedData[currentCategory].push({ name: tempName, url: finalUrl, category: currentCategory });
                         tempName = ''; 
@@ -868,8 +1048,8 @@ http://stream.zeno.fm/ktcdkm8w1qruv.mp3
             errorMsg.style.display = 'none';
             mainStatusText.textContent = "جاري الاتصال...";
 
-            // تغيير الصورة بناءً على القسم
-            const bgUrl = categoryImages[station.category] || categoryImages["Default"];
+            // تغيير الصورة بناءً على القسم الذكي
+            const bgUrl = getBgImage(station.category);
             mainBg.style.backgroundImage = `url('${bgUrl}')`;
 
             if (currentPlayingCard) {
@@ -881,6 +1061,7 @@ http://stream.zeno.fm/ktcdkm8w1qruv.mp3
             cardElement.querySelector('.play-icon').className = 'fas fa-music play-icon'; 
             currentPlayingCard = cardElement;
             
+            // تغيير اسم الإذاعة في المنتصف
             mainStationName.textContent = station.name;
             playIcon.className = 'fas fa-spinner fa-spin'; 
 
@@ -936,7 +1117,7 @@ http://stream.zeno.fm/ktcdkm8w1qruv.mp3
             audioPlayer.load(); 
 
             playIcon.className = 'fas fa-play';
-            mainStationName.textContent = 'اختر إذاعة للبدء';
+            mainStationName.textContent = 'Esma3 Fm';
             mainStatusText.textContent = 'تم إيقاف التشغيل (توفير البيانات)';
             errorMsg.style.display = 'none';
 
