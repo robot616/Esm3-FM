@@ -3,17 +3,21 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Radio Player | مشغل الراديو</title>
-    <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;700&display=swap" rel="stylesheet">
+    <title>Esma3 Fm | اسمع إف إم</title>
+    
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><circle cx='50' cy='50' r='50' fill='%231db954'/><text y='62' x='12' fill='white' font-family='Arial' font-size='32' font-weight='bold'>Esma3</text></svg>">
+    
+    <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;700;900&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     
+    <script src="https://cdn.jsdelivr.net/npm/hls.js@latest"></script>
+
     <style>
         :root {
             --primary: #1db954;
-            --bg-color: #121212;
-            --card-bg: rgba(255, 255, 255, 0.05);
+            --bg-dark: #0a0f16;
+            --card-bg: rgba(255, 255, 255, 0.08);
             --text-main: #ffffff;
-            --text-muted: #b3b3b3;
         }
 
         * {
@@ -24,143 +28,174 @@
         }
 
         body {
-            background-color: var(--bg-color);
-            background-image: radial-gradient(circle at top right, #1a1a2e, #121212);
+            background: linear-gradient(135deg, #121b22 0%, #0a0f16 100%);
             color: var(--text-main);
             min-height: 100vh;
-            padding-bottom: 100px; /* مساحة للمشغل السفلي */
+            padding-bottom: 120px;
+            overflow-x: hidden;
+        }
+
+        /* العلامة المائية في الخلفية */
+        .watermark {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-size: 18vw;
+            color: rgba(255, 255, 255, 0.02);
+            font-weight: 900;
+            white-space: nowrap;
+            z-index: -1;
+            pointer-events: none;
+            user-select: none;
         }
 
         .container {
-            max-width: 800px;
+            max-width: 900px;
             margin: 0 auto;
             padding: 20px;
         }
 
         header {
             text-align: center;
-            margin-bottom: 30px;
+            margin: 40px 0;
         }
 
         header h1 {
-            font-size: 2.5rem;
+            font-size: 3.5rem;
             color: var(--primary);
-            text-shadow: 0 4px 10px rgba(29, 185, 84, 0.3);
+            text-shadow: 0 0 20px rgba(29, 185, 84, 0.4);
+            font-weight: 900;
+            letter-spacing: 2px;
         }
 
-        /* تصميم الأقسام (الكاتيجوري) */
-        .categories {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 10px;
-            justify-content: center;
-            margin-bottom: 30px;
+        header p {
+            color: #a0aab5;
+            font-size: 1.2rem;
+            margin-top: 10px;
         }
 
-        .category-btn {
+        /* تصميم القوائم المنسدلة (Accordions) */
+        .accordion {
             background: var(--card-bg);
             border: 1px solid rgba(255, 255, 255, 0.1);
-            color: var(--text-main);
-            padding: 10px 20px;
-            border-radius: 30px;
-            cursor: pointer;
-            backdrop-filter: blur(10px);
-            transition: all 0.3s ease;
-            font-size: 1.1rem;
-            font-weight: bold;
-        }
-
-        .category-btn:hover, .category-btn.active {
-            background: var(--primary);
-            color: #000;
-            border-color: var(--primary);
-            box-shadow: 0 0 15px rgba(29, 185, 84, 0.5);
-        }
-
-        /* قائمة المحطات */
-        .stations-list {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
-            gap: 15px;
-        }
-
-        .station-card {
-            background: var(--card-bg);
-            border: 1px solid rgba(255, 255, 255, 0.05);
             border-radius: 15px;
+            margin-bottom: 15px;
+            backdrop-filter: blur(10px);
+            overflow: hidden;
+            transition: all 0.3s;
+        }
+
+        .accordion-header {
+            padding: 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            cursor: pointer;
+            font-size: 1.2rem;
+            font-weight: bold;
+            background: rgba(0, 0, 0, 0.2);
+        }
+
+        .accordion-header:hover {
+            background: rgba(29, 185, 84, 0.1);
+        }
+
+        .accordion-header i {
+            transition: transform 0.3s;
+        }
+
+        .accordion.active .accordion-header i {
+            transform: rotate(180deg);
+            color: var(--primary);
+        }
+
+        .accordion-content {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.4s ease-out;
+        }
+
+        .stations-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 15px;
+            padding: 20px;
+        }
+
+        /* كروت الإذاعات */
+        .station-card {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
             padding: 15px;
             display: flex;
             align-items: center;
             justify-content: space-between;
             cursor: pointer;
-            transition: transform 0.2s, background 0.3s;
-            backdrop-filter: blur(5px);
+            transition: all 0.3s;
         }
 
         .station-card:hover {
-            transform: translateY(-3px);
-            background: rgba(255, 255, 255, 0.1);
+            background: rgba(29, 185, 84, 0.1);
+            border-color: rgba(29, 185, 84, 0.5);
+            transform: translateY(-2px);
         }
 
         .station-card.playing {
+            background: rgba(29, 185, 84, 0.2);
             border-color: var(--primary);
-            box-shadow: 0 0 10px rgba(29, 185, 84, 0.2);
+            box-shadow: 0 0 15px rgba(29, 185, 84, 0.3);
         }
 
-        .station-info h3 {
-            font-size: 1.1rem;
-            margin-bottom: 5px;
-        }
-
-        .play-icon {
-            font-size: 1.5rem;
+        .station-card.playing .play-icon {
             color: var(--primary);
         }
 
-        /* المشغل السفلي (الكوبس) */
+        .station-info h3 {
+            font-size: 1rem;
+            line-height: 1.4;
+        }
+
+        .play-icon {
+            font-size: 1.8rem;
+            color: rgba(255, 255, 255, 0.5);
+        }
+
+        /* المشغل السفلي */
         .bottom-player {
             position: fixed;
             bottom: 20px;
             left: 50%;
-            transform: translateX(-50%);
-            width: 90%;
-            max-width: 500px;
-            background: rgba(20, 20, 20, 0.85);
-            backdrop-filter: blur(15px);
-            border: 1px solid rgba(255, 255, 255, 0.1);
+            transform: translateX(-50%) translateY(150%);
+            width: 95%;
+            max-width: 600px;
+            background: rgba(15, 23, 30, 0.95);
+            backdrop-filter: blur(20px);
+            border: 1px solid var(--primary);
             border-radius: 30px;
-            padding: 15px 25px;
+            padding: 15px 30px;
             display: flex;
             align-items: center;
             justify-content: space-between;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.8);
             z-index: 1000;
-            opacity: 0;
-            pointer-events: none;
-            transition: opacity 0.3s ease;
+            transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
         }
 
         .bottom-player.active {
-            opacity: 1;
-            pointer-events: auto;
-        }
-
-        .now-playing {
-            display: flex;
-            flex-direction: column;
-            width: 60%;
-        }
-
-        .now-playing span {
-            font-size: 0.8rem;
-            color: var(--primary);
+            transform: translateX(-50%) translateY(0);
         }
 
         .now-playing h4 {
-            font-size: 1.1rem;
-            white-space: nowrap;
-            overflow: hidden;
-            text-overflow: ellipsis;
+            font-size: 1.2rem;
+            color: var(--primary);
+            margin-bottom: 5px;
+        }
+
+        .now-playing span {
+            font-size: 0.9rem;
+            color: #a0aab5;
         }
 
         .controls {
@@ -172,61 +207,61 @@
         .control-btn {
             background: none;
             border: none;
-            color: var(--text-main);
+            color: white;
             font-size: 1.5rem;
             cursor: pointer;
-            transition: color 0.2s;
-        }
-
-        .control-btn:hover {
-            color: var(--primary);
         }
 
         #playPauseBtn {
             background: var(--primary);
             color: #000;
-            width: 50px;
-            height: 50px;
+            width: 55px;
+            height: 55px;
             border-radius: 50%;
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 1.5rem;
+            font-size: 1.8rem;
+            transition: transform 0.2s;
         }
 
-        /* تصميم للموبايل */
+        #playPauseBtn:hover {
+            transform: scale(1.1);
+        }
+
+        #errorMsg {
+            color: #ff4d4d;
+            font-size: 0.8rem;
+            display: none;
+            margin-top: 5px;
+        }
+
         @media (max-width: 600px) {
-            .bottom-player {
-                width: 95%;
-                bottom: 10px;
-                padding: 10px 20px;
-            }
-            .category-btn {
-                font-size: 1rem;
-                padding: 8px 15px;
-            }
+            header h1 { font-size: 2.5rem; }
+            .bottom-player { padding: 15px; bottom: 15px; }
+            .stations-grid { grid-template-columns: 1fr; }
         }
     </style>
 </head>
 <body>
 
+    <div class="watermark">Esma3 Fm</div>
+
     <div class="container">
         <header>
-            <h1><i class="fas fa-broadcast-tower"></i> Live Radio</h1>
-            <p style="color: var(--text-muted); margin-top: 5px;">أفضل الإذاعات المباشرة</p>
+            <h1>Esma3 Fm</h1>
+            <p>منصتك الاحترافية للراديو المباشر</p>
         </header>
 
-        <div class="categories" id="categoriesContainer">
-            </div>
-
-        <div class="stations-list" id="stationsContainer">
+        <div id="categoriesContainer">
             </div>
     </div>
 
     <div class="bottom-player" id="bottomPlayer">
         <div class="now-playing">
+            <h4 id="currentStationName">اختر إذاعة...</h4>
             <span>يتم التشغيل الآن</span>
-            <h4 id="currentStationName">اختر محطة...</h4>
+            <div id="errorMsg">الإذاعة لا تستجيب حالياً</div>
         </div>
         <div class="controls">
             <button class="control-btn" onclick="toggleMute()"><i id="muteIcon" class="fas fa-volume-up"></i></button>
@@ -237,7 +272,17 @@
     <audio id="audioPlayer"></audio>
 
     <script>
-        // النص الخاص بالملف (M3U) الذي أرسلته
+        // قاموس لتحويل الأسماء الإنجليزية لأسماء احترافية (عربي/إنجليزي)
+        const categoryNames = {
+            "Quran Kreem Radio": "القرآن الكريم | Quran Kareem",
+            "Isalam Radio": "إسلاميات | Islamic Programs",
+            "Mix Radio": "منوعات | Mix",
+            "Songs Fm": "أغاني | Songs",
+            "Singers Fm": "مطربين | Singers",
+            "Cultural& Drama radio": "ثقافة ودراما | Culture & Drama",
+            "Sports Radio": "رياضة | Sports"
+        };
+
         const rawM3U = `
 #EXTM3U
 
@@ -697,128 +742,172 @@ http://stream.zeno.fm/ktcdkm8w1qruv.mp3
         const parsedData = {};
         let currentCategory = "General";
 
-        // أداة جافا سكريبت لتحليل وتحويل الـ M3U التي أرسلتها إلى قوائم ديناميكية
         function parseM3U(data) {
             const lines = data.split('\n');
             let tempName = '';
 
             lines.forEach(line => {
                 line = line.trim();
-                if (!line) return;
-
-                if (line.includes('====') || line.includes('----') || line === '#EXTM3U') {
-                    return; // تجاهل الفواصل
-                }
+                if (!line || line.includes('====') || line.includes('----') || line === '#EXTM3U') return;
 
                 if (!line.startsWith('#') && !line.startsWith('http')) {
-                    // هذا السطر يمثل اسم القسم
-                    currentCategory = line;
-                    if (!parsedData[currentCategory]) {
-                        parsedData[currentCategory] = [];
-                    }
+                    // استخدام الاسم المحسن إذا كان متوفر في القاموس
+                    currentCategory = categoryNames[line] || line;
+                    if (!parsedData[currentCategory]) parsedData[currentCategory] = [];
                 } else if (line.startsWith('#EXTINF')) {
-                    // استخراج اسم المحطة
-                    tempName = line.split(',')[1];
-                    tempName = tempName.replace(/_/g, ' '); // تحويل الشرطة السفلية لمسافات
+                    const parts = line.split(',');
+                    tempName = parts.length > 1 ? parts.slice(1).join(',').replace(/_/g, ' ') : 'محطة غير معروفة';
                 } else if (line.startsWith('http')) {
-                    // الرابط الفعلي للمحطة
                     if (tempName) {
-                        if (!parsedData[currentCategory]) {
-                            parsedData[currentCategory] = [];
+                        // محاولة ترقية الرابط لـ HTTPS لتجنب مشاكل Mixed Content
+                        let finalUrl = line;
+                        if(finalUrl.startsWith('http://live.mp3quran.net')) {
+                            // معظم سيرفرات القرآن تدعم HTTPS الآن
+                            finalUrl = finalUrl.replace('http://', 'https://');
                         }
-                        parsedData[currentCategory].push({ name: tempName, url: line });
-                        tempName = '';
+                        
+                        if (!parsedData[currentCategory]) parsedData[currentCategory] = [];
+                        parsedData[currentCategory].push({ name: tempName, url: finalUrl });
+                        tempName = ''; 
                     }
                 }
             });
         }
 
-        // واجهة المستخدم
         const categoriesContainer = document.getElementById('categoriesContainer');
-        const stationsContainer = document.getElementById('stationsContainer');
         const audioPlayer = document.getElementById('audioPlayer');
         const bottomPlayer = document.getElementById('bottomPlayer');
         const currentStationName = document.getElementById('currentStationName');
         const playIcon = document.getElementById('playIcon');
-        const muteIcon = document.getElementById('muteIcon');
+        const errorMsg = document.getElementById('errorMsg');
         let currentPlayingCard = null;
+        let hlsInstance = null; // نسخة المشغل المتقدم
 
-        function renderCategories() {
-            Object.keys(parsedData).forEach((cat, index) => {
-                const btn = document.createElement('button');
-                btn.className = 'category-btn';
-                if (index === 0) btn.classList.add('active');
-                btn.textContent = cat;
-                btn.onclick = () => {
-                    document.querySelectorAll('.category-btn').forEach(b => b.classList.remove('active'));
-                    btn.classList.add('active');
-                    renderStations(cat);
-                };
-                categoriesContainer.appendChild(btn);
-            });
-            // تشغيل القسم الأول افتراضياً
-            if (Object.keys(parsedData).length > 0) {
-                renderStations(Object.keys(parsedData)[0]);
-            }
-        }
-
-        function renderStations(category) {
-            stationsContainer.innerHTML = '';
-            const stations = parsedData[category] || [];
-            
-            stations.forEach(station => {
-                const card = document.createElement('div');
-                card.className = 'station-card';
-                card.innerHTML = `
-                    <div class="station-info">
-                        <h3>${station.name}</h3>
-                    </div>
-                    <i class="fas fa-play-circle play-icon"></i>
-                `;
+        function renderUI() {
+            Object.keys(parsedData).forEach((cat) => {
+                const stations = parsedData[cat];
                 
-                card.onclick = () => playStation(station, card);
-                stationsContainer.appendChild(card);
+                // إنشاء القائمة المنسدلة (Accordion)
+                const accordion = document.createElement('div');
+                accordion.className = 'accordion';
+                
+                const header = document.createElement('div');
+                header.className = 'accordion-header';
+                header.innerHTML = `<span>${cat} <small style="color:var(--primary); font-size:0.8em">(${stations.length})</small></span> <i class="fas fa-chevron-down"></i>`;
+                
+                const content = document.createElement('div');
+                content.className = 'accordion-content';
+                
+                const grid = document.createElement('div');
+                grid.className = 'stations-grid';
+
+                stations.forEach(station => {
+                    const card = document.createElement('div');
+                    card.className = 'station-card';
+                    card.innerHTML = `
+                        <div class="station-info">
+                            <h3>${station.name}</h3>
+                        </div>
+                        <i class="fas fa-play play-icon"></i>
+                    `;
+                    card.onclick = () => playStation(station, card);
+                    grid.appendChild(card);
+                });
+
+                content.appendChild(grid);
+                accordion.appendChild(header);
+                accordion.appendChild(content);
+                
+                // منطق فتح وقفل القائمة
+                header.onclick = () => {
+                    const isActive = accordion.classList.contains('active');
+                    document.querySelectorAll('.accordion').forEach(acc => {
+                        acc.classList.remove('active');
+                        acc.querySelector('.accordion-content').style.maxHeight = null;
+                    });
+                    
+                    if (!isActive) {
+                        accordion.classList.add('active');
+                        content.style.maxHeight = content.scrollHeight + "px";
+                    }
+                };
+
+                categoriesContainer.appendChild(accordion);
             });
         }
 
         function playStation(station, cardElement) {
+            errorMsg.style.display = 'none';
+
             if (currentPlayingCard) {
                 currentPlayingCard.classList.remove('playing');
-                currentPlayingCard.querySelector('.play-icon').classList.replace('fa-pause-circle', 'fa-play-circle');
+                currentPlayingCard.querySelector('.play-icon').className = 'fas fa-play play-icon';
             }
             
             cardElement.classList.add('playing');
-            cardElement.querySelector('.play-icon').classList.replace('fa-play-circle', 'fa-pause-circle');
+            cardElement.querySelector('.play-icon').className = 'fas fa-chart-bar play-icon'; // شكل متحرك مجازاً
             currentPlayingCard = cardElement;
-
-            audioPlayer.src = station.url;
-            audioPlayer.play();
-            
             currentStationName.textContent = station.name;
             bottomPlayer.classList.add('active');
-            playIcon.className = 'fas fa-pause';
+            playIcon.className = 'fas fa-spinner fa-spin'; // علامة تحميل
+
+            // تدمير النسخة السابقة من HLS لو موجودة
+            if (hlsInstance) {
+                hlsInstance.destroy();
+                hlsInstance = null;
+            }
+
+            // استخدام مكتبة HLS للصيغ المعقدة أو المشغل الافتراضي للصيغ العادية
+            if ((station.url.includes('.m3u8') || station.url.includes('.ts')) && Hls.isSupported()) {
+                hlsInstance = new Hls();
+                hlsInstance.loadSource(station.url);
+                hlsInstance.attachMedia(audioPlayer);
+                hlsInstance.on(Hls.Events.MANIFEST_PARSED, function() {
+                    audioPlayer.play().then(() => {
+                        playIcon.className = 'fas fa-pause';
+                    }).catch(e => handleError());
+                });
+                hlsInstance.on(Hls.Events.ERROR, function (event, data) {
+                    if (data.fatal) handleError();
+                });
+            } else {
+                audioPlayer.src = station.url;
+                audioPlayer.play().then(() => {
+                    playIcon.className = 'fas fa-pause';
+                }).catch(e => handleError());
+            }
+        }
+
+        function handleError() {
+            playIcon.className = 'fas fa-play';
+            errorMsg.style.display = 'block';
+            if (currentPlayingCard) {
+                currentPlayingCard.querySelector('.play-icon').className = 'fas fa-play play-icon';
+            }
         }
 
         function togglePlay() {
             if (audioPlayer.paused) {
                 audioPlayer.play();
                 playIcon.className = 'fas fa-pause';
-                if (currentPlayingCard) currentPlayingCard.querySelector('.play-icon').classList.replace('fa-play-circle', 'fa-pause-circle');
+                if (currentPlayingCard) currentPlayingCard.querySelector('.play-icon').className = 'fas fa-chart-bar play-icon';
             } else {
                 audioPlayer.pause();
                 playIcon.className = 'fas fa-play';
-                if (currentPlayingCard) currentPlayingCard.querySelector('.play-icon').classList.replace('fa-pause-circle', 'fa-play-circle');
+                if (currentPlayingCard) currentPlayingCard.querySelector('.play-icon').className = 'fas fa-play play-icon';
             }
         }
 
         function toggleMute() {
             audioPlayer.muted = !audioPlayer.muted;
-            muteIcon.className = audioPlayer.muted ? 'fas fa-volume-mute' : 'fas fa-volume-up';
+            document.getElementById('muteIcon').className = audioPlayer.muted ? 'fas fa-volume-mute' : 'fas fa-volume-up';
         }
 
-        // بدء التشغيل وتحليل البيانات
+        // معالجة أخطاء التشغيل الافتراضية
+        audioPlayer.addEventListener('error', handleError);
+
         parseM3U(rawM3U);
-        renderCategories();
+        renderUI();
     </script>
 </body>
 </html>
