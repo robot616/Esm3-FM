@@ -6,7 +6,6 @@
     <title>Esma3 Fm</title>
     
     <link rel="icon" type="image/png" href="https://cdn-icons-png.flaticon.com/512/1000/1000143.png">
-    
     <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;700;900&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     
@@ -14,15 +13,6 @@
     <script src="https://cdn.jsdelivr.net/npm/mpegts.js@latest/dist/mpegts.min.js"></script>
 
     <style>
-        :root {
-            --primary: #00f2fe;
-            --main-bg: #0b1117;
-            --sidebar-bg: #151a22;
-            --box-bg: #1a2028;
-            --text-main: #ffffff;
-            --text-muted: #8899a6;
-        }
-
         * {
             box-sizing: border-box;
             margin: 0;
@@ -31,43 +21,35 @@
         }
 
         body {
-            background-color: var(--main-bg);
-            color: var(--text-main);
+            /* لون الخلفية الرئيسي الغامق مطابق للصورة */
+            background-color: #0d131a;
+            color: #ffffff;
             height: 100vh;
             overflow: hidden; 
             display: flex;
         }
 
-        /* القائمة على الشمال */
-        .app-container {
-            display: flex;
-            width: 100%;
-            height: 100%;
-            flex-direction: row-reverse; 
-        }
-
-        /* القائمة الجانبية */
+        /* ---------------- الشريط الجانبي (يمين) ---------------- */
         .sidebar {
             width: 320px;
-            background-color: var(--sidebar-bg);
-            border-right: 1px solid rgba(255,255,255,0.05);
+            background-color: #1a222c; /* لون القائمة المطابق للصورة */
+            border-left: 1px solid rgba(255,255,255,0.02);
             display: flex;
             flex-direction: column;
             height: 100%;
             z-index: 10;
+            box-shadow: -5px 0 15px rgba(0,0,0,0.2);
         }
 
         .sidebar-header {
-            padding: 25px 20px;
+            padding: 30px 20px;
             text-align: center;
-            background: rgba(0, 0, 0, 0.4);
-            border-bottom: 1px solid rgba(255,255,255,0.05);
         }
 
         .sidebar-header h2 {
             font-size: 2rem;
             font-weight: 900;
-            color: var(--primary);
+            color: #00f2fe; /* اللبني المميز */
             letter-spacing: 1px;
         }
 
@@ -77,13 +59,13 @@
             padding: 10px 15px;
         }
 
-        .categories-container::-webkit-scrollbar { width: 5px; }
+        .categories-container::-webkit-scrollbar { width: 4px; }
         .categories-container::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.1); border-radius: 10px; }
 
         .accordion {
-            background: var(--box-bg);
-            border-radius: 8px;
-            margin-bottom: 8px;
+            background: #232d38; /* لون البوكسات في القائمة */
+            border-radius: 6px;
+            margin-bottom: 10px;
             overflow: hidden;
         }
 
@@ -99,7 +81,7 @@
         }
 
         .accordion-header:hover { background: rgba(255, 255, 255, 0.05); }
-        .accordion.active .accordion-header { color: var(--primary); }
+        .accordion.active .accordion-header { color: #00f2fe; }
         .accordion-header i { font-size: 0.8rem; transition: 0.3s; }
         .accordion.active .accordion-header i { transform: rotate(180deg); }
 
@@ -107,11 +89,11 @@
             max-height: 0;
             overflow: hidden;
             transition: max-height 0.3s ease-out;
-            background: rgba(0,0,0,0.2);
+            background: rgba(0,0,0,0.15);
         }
 
         .station-card {
-            padding: 12px 15px;
+            padding: 12px 20px;
             border-top: 1px solid rgba(255,255,255,0.02);
             display: flex;
             justify-content: space-between;
@@ -121,107 +103,95 @@
         }
 
         .station-card:hover { background: rgba(255,255,255,0.05); }
-        .station-card.playing { border-right: 3px solid var(--primary); background: rgba(0, 242, 254, 0.05); }
-        .station-card.playing .play-icon { color: var(--primary); }
-        .station-card h3 { font-size: 0.85rem; font-weight: normal; line-height: 1.4; }
+        .station-card.playing { border-right: 3px solid #00f2fe; background: rgba(0, 242, 254, 0.05); }
+        .station-card.playing .play-icon { color: #00f2fe; }
+        .station-card h3 { font-size: 0.85rem; font-weight: normal; }
         .play-icon { font-size: 0.8rem; color: #666; }
 
-        /* منطقة العرض الرئيسية - الصورة بكامل الشاشة */
+        /* ---------------- منطقة المشغل (يسار) ---------------- */
         .main-player {
             flex: 1;
             display: flex;
             flex-direction: column;
             justify-content: center;
             align-items: center;
-            position: relative;
-            background-color: #0b1117;
-            background-size: cover;
-            background-position: center;
-            transition: background-image 0.5s ease-in-out;
+            background-color: #0d131a;
         }
 
-        .overlay {
-            position: absolute;
-            top: 0; left: 0; right: 0; bottom: 0;
-            background: linear-gradient(to top, rgba(0,0,0,0.95) 0%, rgba(0,0,0,0.4) 100%);
-            z-index: 1;
-        }
-
-        /* اللوحة الزجاجية في المنتصف فوق الصورة */
-        .glass-panel {
-            position: relative;
-            z-index: 2;
-            background: rgba(15, 23, 30, 0.7);
-            backdrop-filter: blur(20px);
-            -webkit-backdrop-filter: blur(20px);
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            border-radius: 30px;
-            padding: 50px 40px;
-            text-align: center;
-            width: 85%;
-            max-width: 500px;
-            box-shadow: 0 20px 50px rgba(0,0,0,0.8);
+        /* الصورة المربعة مطابقة للصورة اللي بعتها */
+        .album-art {
+            width: 320px;
+            height: 320px;
+            border-radius: 15px;
+            object-fit: cover;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+            margin-bottom: 30px;
+            background-color: #111;
         }
 
         .player-info {
-            margin-bottom: 40px;
+            text-align: center;
+            margin-bottom: 30px;
         }
 
-        .player-info h3 {
+        .title-text {
+            color: #00f2fe;
             font-size: 1.8rem;
-            color: #fff;
-            margin-bottom: 10px;
             font-weight: 900;
-            text-shadow: 0 4px 10px rgba(0,0,0,0.5);
+            margin-bottom: 10px;
         }
 
-        .player-info p {
-            color: var(--primary);
+        .status-text {
+            color: #8899a6;
             font-size: 1rem;
-            font-weight: bold;
         }
 
-        /* أزرار التحكم */
-        .controls-wrapper {
+        /* الكبسولة اللي تحت مطابقة للتصميم */
+        .controls-pill {
+            background: #151a22; /* لون الكبسولة */
+            border: 1px solid rgba(255, 255, 255, 0.02);
+            border-radius: 50px;
+            padding: 10px 40px;
             display: flex;
             align-items: center;
-            justify-content: center;
             gap: 40px;
+            box-shadow: 0 10px 20px rgba(0,0,0,0.3);
         }
 
         .btn-control {
             background: none;
             border: none;
-            color: #fff;
-            font-size: 1.5rem;
+            font-size: 1.6rem;
             cursor: pointer;
             transition: 0.2s;
         }
+        
+        .btn-vol { color: #ffffff; }
+        .btn-vol:hover { color: #00f2fe; }
+        
+        .btn-stop { color: #ff4d4d; }
+        .btn-stop:hover { color: #ff1a1a; }
 
-        .btn-control:hover { color: var(--primary); transform: scale(1.1); }
-
-        .btn-play-pause {
-            width: 75px;
-            height: 75px;
-            background: var(--primary);
+        .btn-play {
+            width: 70px;
+            height: 70px;
+            background: #00f2fe; /* الدائرة اللبني */
             border-radius: 50%;
             display: flex;
             justify-content: center;
             align-items: center;
-            font-size: 2.2rem;
+            font-size: 2rem;
             color: #000;
             border: none;
             cursor: pointer;
-            box-shadow: 0 0 25px rgba(0, 242, 254, 0.4);
+            box-shadow: 0 0 25px rgba(0, 242, 254, 0.3);
             transition: 0.2s;
         }
-        .btn-play-pause:hover { transform: scale(1.05); }
+        .btn-play:hover { transform: scale(1.05); }
 
-        .btn-stop { color: #ff4d4d; }
-        .btn-stop:hover { color: #ff1a1a; }
+        #errorMsg { color: #ff4d4d; font-size: 0.9rem; margin-top: 15px; display: none; font-weight: bold; }
 
-        #errorMsg { color: #ff4d4d; margin-top: 20px; display: none; font-size: 0.9rem; font-weight: bold; }
-
+        /* الموبايل */
         .mobile-menu-btn {
             display: none;
             position: absolute;
@@ -232,72 +202,66 @@
             z-index: 100;
             background: none;
             border: none;
-            text-shadow: 0 2px 10px rgba(0,0,0,0.8);
         }
 
         @media (max-width: 900px) {
-            .app-container { flex-direction: column; }
+            body { flex-direction: column; }
             .mobile-menu-btn { display: block; }
             .sidebar {
                 position: fixed;
-                left: -100%;
+                right: -100%;
                 top: 0;
                 width: 80%;
                 max-width: 320px;
                 z-index: 50;
-                transition: left 0.3s;
-                border-right: none;
-                box-shadow: 5px 0 20px rgba(0,0,0,0.5);
+                transition: right 0.3s;
+                box-shadow: -5px 0 20px rgba(0,0,0,0.5);
             }
-            .sidebar.show { left: 0; }
+            .sidebar.show { right: 0; }
         }
     </style>
 </head>
 <body>
 
-    <div class="app-container">
+    <button class="mobile-menu-btn" onclick="toggleSidebar()"><i class="fas fa-bars"></i></button>
+
+    <aside class="sidebar" id="sidebar">
+        <div class="sidebar-header">
+            <h2>Esma3 Fm</h2>
+        </div>
+        <div class="categories-container" id="categoriesContainer"></div>
+    </aside>
+
+    <main class="main-player">
         
-        <aside class="sidebar" id="sidebar">
-            <div class="sidebar-header">
-                <h2>Esma3 Fm</h2>
-            </div>
-            <div class="categories-container" id="categoriesContainer"></div>
-        </aside>
+        <img id="coverArt" class="album-art" src="https://t4.ftcdn.net/jpg/00/97/58/53/240_F_97585358_X0iOzQQW5qo9FKLNyOkYH3REuCAqX0Lv.jpg" onerror="this.src='https://t4.ftcdn.net/jpg/00/97/58/53/240_F_97585358_X0iOzQQW5qo9FKLNyOkYH3REuCAqX0Lv.jpg'">
+        
+        <div class="player-info">
+            <h3 id="mainStationName" class="title-text">اختر إذاعة للبدء</h3>
+            <p id="mainStatusText" class="status-text">تم إيقاف التشغيل (توفير البيانات)</p>
+        </div>
 
-        <button class="mobile-menu-btn" onclick="toggleSidebar()"><i class="fas fa-bars"></i></button>
-
-        <main class="main-player" id="mainBg">
-            <div class="overlay"></div>
+        <div class="controls-pill">
+            <button class="btn-control btn-vol" onclick="toggleMute()">
+                <i id="muteIcon" class="fas fa-volume-up"></i>
+            </button>
             
-            <div class="glass-panel">
-                <div class="player-info">
-                    <h3 id="mainStationName">Esma3 Fm</h3>
-                    <p id="mainStatusText">اختر إذاعة للبدء</p>
-                </div>
+            <button class="btn-play" id="playPauseBtn" onclick="togglePlay()">
+                <i id="playIcon" class="fas fa-play"></i>
+            </button>
 
-                <div class="controls-wrapper">
-                    <button class="btn-control" onclick="toggleMute()">
-                        <i id="muteIcon" class="fas fa-volume-up"></i>
-                    </button>
-                    
-                    <button class="btn-play-pause" id="playPauseBtn" onclick="togglePlay()">
-                        <i id="playIcon" class="fas fa-play"></i>
-                    </button>
+            <button class="btn-control btn-stop" onclick="stopRadio()" title="إيقاف تام">
+                <i class="fas fa-power-off"></i>
+            </button>
+        </div>
+        
+        <p id="errorMsg"></p>
 
-                    <button class="btn-control btn-stop" onclick="stopRadio()" title="إيقاف تام">
-                        <i class="fas fa-power-off"></i>
-                    </button>
-                </div>
-                
-                <p id="errorMsg"></p>
-            </div>
-
-            <audio id="audioPlayer"></audio>
-        </main>
-    </div>
+        <audio id="audioPlayer"></audio>
+    </main>
 
     <script>
-        // الصور اللي أنت طلبتها بالمللي، والبديل صورة الميكسر
+        // الروابط اللي طلبتها بالمللي
         const defaultImage = "https://t4.ftcdn.net/jpg/00/97/58/53/240_F_97585358_X0iOzQQW5qo9FKLNyOkYH3REuCAqX0Lv.jpg";
         
         const categoryImages = {
@@ -323,20 +287,7 @@
             if (categoryStr.includes('أغاني') || categoryStr.includes('مطربين')) return categoryImages["Songs"];
             if (categoryStr.includes('رياضة')) return categoryImages["Sports"];
             if (categoryStr.includes('ثقافة') || categoryStr.includes('دراما')) return categoryImages["Drama"];
-            if (categoryStr.includes('منوعات')) return categoryImages["Mix"];
-            return defaultImage;
-        }
-
-        // دالة لاختبار الصورة، لو فشلت ترجع الصورة الافتراضية
-        function setSafeBackgroundImage(element, imageUrl) {
-            const img = new Image();
-            img.onload = function() {
-                element.style.backgroundImage = \`url('\${imageUrl}')\`;
-            };
-            img.onerror = function() {
-                element.style.backgroundImage = \`url('\${defaultImage}')\`;
-            };
-            img.src = imageUrl;
+            return categoryImages["Mix"];
         }
 
         function formatStationName(rawName) {
@@ -368,16 +319,18 @@
                  "Anis FM 1": "أنيس إف إم 1"
              };
              let cleanName = rawName.replace(/_/g, ' ').trim();
-             let baseName = cleanName.replace(/\s*\d+$/, '').trim(); 
+             let baseName = cleanName.replace(/\\s*\\d+$/, '').trim(); 
              let arName = translations[cleanName] || translations[baseName];
-             if (arName) return \`\${arName} | \${cleanName}\`;
+             if (arName) return arName + ' | ' + cleanName;
              return cleanName;
         }
 
-        const rawM3U = \`
+        // الكود الكامل بدون أي نقصان
+        const rawM3U = `
 #EXTM3U
 
 Quran Kreem Radio
+
 #EXTINF:-1,Rawe3_El_Telwat_FM
 https://stream-172.zeno.fm/bg2j1n5ntltuv?zt=eyJhbGciOiJIUzI1NiJ9
 #EXTINF:-1,Beautiful_Recitations
@@ -828,13 +781,13 @@ https://djuplink.com/live11.ogg
 http://78.129.252.13:24460/stream
 #EXTINF:-1,Aswat_AlWeb_2
 http://stream.zeno.fm/ktcdkm8w1qruv.mp3
-\`;
+`;
 
         const parsedData = {};
         let currentCategory = "General";
 
         function parseM3U(data) {
-            const lines = data.split('\\n');
+            const lines = data.split('\n');
             let tempName = '';
             lines.forEach(line => {
                 line = line.trim();
@@ -854,6 +807,7 @@ http://stream.zeno.fm/ktcdkm8w1qruv.mp3
                     if (tempName) {
                         let finalUrl = line.split('#')[0]; 
                         
+                        // استخدام بروكسي آمن للروابط التي يتم حظرها بسبب (HTTP)
                         if (window.location.protocol === 'https:' && finalUrl.startsWith('http://') && !finalUrl.includes('live.mp3quran')) {
                             finalUrl = 'https://api.allorigins.win/raw?url=' + encodeURIComponent(finalUrl);
                         } else if (finalUrl.startsWith('http://live.mp3quran.net')) {
@@ -875,15 +829,13 @@ http://stream.zeno.fm/ktcdkm8w1qruv.mp3
         const playIcon = document.getElementById('playIcon');
         const errorMsg = document.getElementById('errorMsg');
         const sidebar = document.getElementById('sidebar');
-        const mainBg = document.getElementById('mainBg');
+        const coverArt = document.getElementById('coverArt');
         
         let currentPlayingCard = null;
         let hlsInstance = null;
         let mpegtsInstance = null;
 
         function renderSidebar() {
-            setSafeBackgroundImage(mainBg, getBgImage("منوعات | Mix Radio"));
-
             Object.keys(parsedData).forEach((cat) => {
                 const stations = parsedData[cat];
                 const accordion = document.createElement('div');
@@ -891,7 +843,15 @@ http://stream.zeno.fm/ktcdkm8w1qruv.mp3
                 
                 const header = document.createElement('div');
                 header.className = 'accordion-header';
-                header.innerHTML = \`<span>\${cat} <small style="opacity:0.5; font-size:0.8em">(\${stations.length})</small></span> <i class="fas fa-chevron-down"></i>\`;
+                
+                const textSpan = document.createElement('span');
+                textSpan.innerHTML = cat + ' <small style="opacity:0.5; font-size:0.8em">(' + stations.length + ')</small>';
+                
+                const icon = document.createElement('i');
+                icon.className = 'fas fa-chevron-down';
+                
+                header.appendChild(textSpan);
+                header.appendChild(icon);
                 
                 const content = document.createElement('div');
                 content.className = 'accordion-content';
@@ -899,7 +859,7 @@ http://stream.zeno.fm/ktcdkm8w1qruv.mp3
                 stations.forEach(station => {
                     const card = document.createElement('div');
                     card.className = 'station-card';
-                    card.innerHTML = \`<h3>\${station.name}</h3> <i class="fas fa-play play-icon"></i>\`;
+                    card.innerHTML = '<h3>' + station.name + '</h3> <i class="fas fa-play play-icon"></i>';
                     card.onclick = () => playStation(station, card);
                     content.appendChild(card);
                 });
@@ -926,8 +886,8 @@ http://stream.zeno.fm/ktcdkm8w1qruv.mp3
             errorMsg.style.display = 'none';
             mainStatusText.textContent = "جاري الاتصال...";
 
-            // تغيير الخلفية لكامل الشاشة بطريقة آمنة
-            setSafeBackgroundImage(mainBg, getBgImage(station.category));
+            // تحديث الصورة في المنتصف بشكل آمن
+            coverArt.src = getBgImage(station.category);
 
             if (currentPlayingCard) {
                 currentPlayingCard.classList.remove('playing');
@@ -1019,7 +979,7 @@ http://stream.zeno.fm/ktcdkm8w1qruv.mp3
             audioPlayer.load(); 
 
             playIcon.className = 'fas fa-play';
-            mainStationName.textContent = 'Esma3 Fm';
+            mainStationName.textContent = 'اختر إذاعة للبدء';
             mainStatusText.textContent = 'تم إيقاف التشغيل (توفير البيانات)';
             errorMsg.style.display = 'none';
 
