@@ -43,7 +43,6 @@
             display: flex;
             width: 100%;
             height: 100%;
-            /* لجعل القائمة على الشمال في اتجاه RTL */
             flex-direction: row-reverse;
             overflow: hidden;
         }
@@ -69,7 +68,6 @@
             color: var(--primary);
         }
 
-        /* تنسيق القائمة المنسدلة (الدروب داون) */
         .dropdown-container {
             padding: 15px 20px;
             background-color: rgba(0, 0, 0, 0.15);
@@ -90,10 +88,9 @@
             cursor: pointer;
             appearance: none;
             -webkit-appearance: none;
-            /* سهم مخصص للقائمة */
             background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%2300f2fe' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e");
             background-repeat: no-repeat;
-            background-position: left 15px center; /* وضع السهم على اليسار لأن الاتجاه RTL */
+            background-position: left 15px center; 
             background-size: 1em;
             transition: all 0.3s;
         }
@@ -192,7 +189,7 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            gap: 40px;
+            gap: 30px;
         }
 
         .btn-control {
@@ -266,10 +263,9 @@
                 <h2 id="currentCategoryTitle">القرآن الكريم</h2>
             </div>
             
-            <!-- القائمة المنسدلة لاختيار الأقسام -->
             <div class="dropdown-container">
                 <select id="categorySelect" class="category-dropdown" onchange="handleCategoryChange()">
-                    <!-- سيتم إضافة الأقسام هنا برمجياً -->
+                    <!-- الأقسام تُضاف هنا برمجياً -->
                 </select>
             </div>
             
@@ -295,8 +291,13 @@
                         <i id="playIcon" class="fas fa-play"></i>
                     </button>
                     
-                    <button class="btn-control" onclick="toggleMute()">
+                    <button class="btn-control" onclick="toggleMute()" title="كتم الصوت">
                         <i id="muteIcon" class="fas fa-volume-up"></i>
+                    </button>
+
+                    <!-- زر تكبير الشاشة الجديد -->
+                    <button class="btn-control" onclick="toggleFullScreen()" title="ملء الشاشة">
+                        <i id="expandIcon" class="fas fa-expand"></i>
                     </button>
                 </div>
             </div>
@@ -570,7 +571,6 @@
         let currentPlayingCard = null;
         let hlsInstance = null; 
 
-        // إضافة الأقسام في القائمة المنسدلة
         function initDropdown() {
             Object.keys(radioData).forEach((categoryName) => {
                 const option = document.createElement('option');
@@ -578,12 +578,10 @@
                 option.textContent = categoryName;
                 categorySelect.appendChild(option);
             });
-            // تحميل القسم الافتراضي
             categorySelect.value = 'القرآن الكريم';
             loadCategory('القرآن الكريم');
         }
 
-        // دالة يتم استدعاؤها عند تغيير القسم من القائمة
         function handleCategoryChange() {
             const selectedCategory = categorySelect.value;
             loadCategory(selectedCategory);
@@ -700,6 +698,38 @@
         function toggleSidebar() { 
             sidebar.classList.toggle('show'); 
         }
+
+        function toggleFullScreen() {
+            const playerElement = document.getElementById('mainBg');
+            const expandIcon = document.getElementById('expandIcon');
+
+            if (!document.fullscreenElement) {
+                if (playerElement.requestFullscreen) {
+                    playerElement.requestFullscreen();
+                } else if (playerElement.webkitRequestFullscreen) {
+                    playerElement.webkitRequestFullscreen();
+                } else if (playerElement.msRequestFullscreen) {
+                    playerElement.msRequestFullscreen();
+                }
+            } else {
+                if (document.exitFullscreen) {
+                    document.exitFullscreen();
+                } else if (document.webkitExitFullscreen) {
+                    document.webkitExitFullscreen();
+                } else if (document.msExitFullscreen) {
+                    document.msExitFullscreen();
+                }
+            }
+        }
+
+        document.addEventListener('fullscreenchange', () => {
+            const expandIcon = document.getElementById('expandIcon');
+            if (!document.fullscreenElement) {
+                expandIcon.className = 'fas fa-expand';
+            } else {
+                expandIcon.className = 'fas fa-compress';
+            }
+        });
 
         audioPlayer.addEventListener('error', handleError);
 
