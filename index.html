@@ -19,8 +19,8 @@
         :root {
             --primary: #00f2fe;
             --secondary: #4facfe;
-            --sidebar-bg: #111820;
-            --card-bg: rgba(255, 255, 255, 0.05);
+            --sidebar-bg: #151a21;
+            --card-bg: #1e242b;
             --text-main: #ffffff;
         }
 
@@ -40,50 +40,123 @@
         }
 
         .main-content {
-            display: flex;
             width: 100%;
             height: 100%;
-            flex-direction: row-reverse;
-            overflow: hidden;
+            position: relative;
         }
 
+        /* زر القائمة الجانبية (الثلاث نقاط في الشمال) */
+        .menu-btn {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            font-size: 1.8rem;
+            color: white;
+            z-index: 100;
+            background: none;
+            border: none;
+            cursor: pointer;
+            text-shadow: 0 2px 10px rgba(0,0,0,0.8);
+            transition: color 0.2s;
+        }
+        .menu-btn:hover { color: var(--primary); }
+
+        /* الأزرار العلوية يمين (إيقاف ومؤقت النوم) */
+        .top-actions {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            display: flex;
+            gap: 15px;
+            z-index: 100;
+        }
+
+        .action-btn {
+            background: rgba(0, 0, 0, 0.6);
+            border: none;
+            color: white;
+            width: 45px;
+            height: 45px;
+            border-radius: 50%;
+            font-size: 1.2rem;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s;
+            position: relative;
+            backdrop-filter: blur(5px);
+        }
+        .action-btn:hover { background: var(--primary); color: #000; }
+        .action-btn.btn-stop:hover { background: #ff4d4d; color: white; }
+
+        .badge {
+            position: absolute;
+            top: -5px;
+            right: -5px;
+            background: var(--primary);
+            color: #000;
+            font-size: 0.75rem;
+            font-weight: bold;
+            padding: 2px 6px;
+            border-radius: 10px;
+        }
+
+        /* القائمة الجانبية */
         .sidebar {
+            position: absolute;
+            left: -100%;
+            top: 0;
+            bottom: 0;
             width: 350px;
             background-color: var(--sidebar-bg);
             border-right: 1px solid rgba(255, 255, 255, 0.05);
             display: flex;
             flex-direction: column;
-            height: 100%;
-            z-index: 10;
+            z-index: 200;
+            transition: left 0.3s ease-in-out;
+            box-shadow: 10px 0 30px rgba(0,0,0,0.7);
         }
+        .sidebar.show { left: 0; }
 
-        .sidebar-header {
-            padding: 20px;
-            background: rgba(0, 0, 0, 0.3);
-            text-align: center;
-        }
-
-        .sidebar-header h2 {
+        .close-sidebar {
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            background: none;
+            border: none;
+            color: white;
             font-size: 1.5rem;
-            color: var(--primary);
+            cursor: pointer;
+            transition: color 0.2s;
         }
+        .close-sidebar:hover { color: #ff4d4d; }
 
         .dropdown-container {
-            padding: 15px 20px;
-            background-color: rgba(0, 0, 0, 0.15);
-            border-bottom: 2px solid rgba(0, 242, 254, 0.2);
+            padding: 40px 20px 20px 20px;
+            border-bottom: 2px solid var(--primary);
+        }
+        
+        .dropdown-label {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            color: #d1d5db;
+            font-weight: bold;
+            margin-bottom: 10px;
+            font-size: 1.1rem;
         }
 
         .category-dropdown {
             width: 100%;
             padding: 12px 15px 12px 40px;
-            background: var(--card-bg);
-            color: var(--text-main);
-            border: 1px solid rgba(255, 255, 255, 0.1);
+            background: #000;
+            color: var(--primary);
+            border: 1px solid var(--primary);
             border-radius: 10px;
-            font-size: 1.1rem;
+            font-size: 1.2rem;
             font-family: 'Tajawal', sans-serif;
-            font-weight: bold;
+            font-weight: 900;
             outline: none;
             cursor: pointer;
             appearance: none;
@@ -91,13 +164,8 @@
             background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%2300f2fe' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e");
             background-repeat: no-repeat;
             background-position: left 15px center; 
-            background-size: 1em;
-            transition: all 0.3s;
-        }
-
-        .category-dropdown:hover, .category-dropdown:focus {
-            border-color: var(--primary);
-            background: rgba(0, 242, 254, 0.05);
+            background-size: 1.2em;
+            box-shadow: inset 0 0 10px rgba(0, 242, 254, 0.1);
         }
 
         .category-dropdown option {
@@ -109,17 +177,17 @@
         .stations-container {
             flex: 1;
             overflow-y: auto;
-            padding: 10px;
+            padding: 15px;
         }
 
         .stations-container::-webkit-scrollbar { width: 5px; }
         .stations-container::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.2); border-radius: 10px; }
 
         .station-card {
-            padding: 15px 20px;
+            padding: 16px 20px;
             background: var(--card-bg);
-            border-radius: 10px;
-            margin-bottom: 8px;
+            border-radius: 8px;
+            margin-bottom: 10px;
             display: flex;
             justify-content: space-between;
             align-items: center;
@@ -130,16 +198,19 @@
 
         .station-card:hover { background: rgba(255,255,255,0.1); }
         .station-card.playing {
-            border: 1px solid var(--primary);
-            background: rgba(0, 242, 254, 0.1);
+            border-color: var(--primary);
+            background: rgba(0, 242, 254, 0.08);
         }
 
         .station-card.playing .play-icon { color: var(--primary); }
-        .station-card h3 { font-size: 1rem; font-weight: normal; }
+        .station-card h3 { font-size: 1rem; font-weight: bold; }
 
+        /* منطقة المشغل الرئيسية */
         .main-player {
-            flex: 1;
-            position: relative;
+            width: 100%;
+            height: 100%;
+            position: absolute;
+            top: 0; left: 0;
             display: flex;
             justify-content: center;
             align-items: center;
@@ -151,37 +222,37 @@
         .overlay {
             position: absolute;
             top: 0; left: 0; right: 0; bottom: 0;
-            background: linear-gradient(to top, rgba(0,0,0,0.95) 0%, rgba(0,0,0,0.5) 100%);
+            background: linear-gradient(to top, rgba(0,0,0,0.95) 0%, rgba(0,0,0,0.4) 100%);
             z-index: 1;
         }
 
         .glass-panel {
             position: relative;
             z-index: 2;
-            background: rgba(15, 23, 30, 0.65);
-            backdrop-filter: blur(20px);
-            -webkit-backdrop-filter: blur(20px);
+            background: rgba(20, 25, 30, 0.85);
+            backdrop-filter: blur(25px);
+            -webkit-backdrop-filter: blur(25px);
             border: 1px solid rgba(255, 255, 255, 0.1);
-            border-radius: 30px;
-            padding: 50px;
+            border-radius: 25px;
+            padding: 40px;
             text-align: center;
-            width: 85%;
-            max-width: 650px;
-            box-shadow: 0 20px 50px rgba(0,0,0,0.6);
+            width: 90%;
+            max-width: 500px;
+            box-shadow: 0 20px 50px rgba(0,0,0,0.8);
         }
 
         .player-info h3 {
-            font-size: 2rem;
+            font-size: 1.8rem;
             color: #ffffff;
-            margin-bottom: 10px;
+            margin-bottom: 12px;
             text-shadow: 0 4px 10px rgba(0,0,0,0.5);
-            font-weight: 700;
+            font-weight: 900;
         }
 
         .player-info p {
             color: var(--primary);
-            font-size: 1.2rem;
-            margin-bottom: 30px;
+            font-size: 1.1rem;
+            margin-bottom: 35px;
             font-weight: bold;
         }
 
@@ -189,83 +260,67 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            gap: 30px;
+            gap: 25px;
         }
 
         .btn-control {
             background: none;
             border: none;
             color: white;
-            font-size: 2rem;
+            font-size: 1.5rem;
             cursor: pointer;
             transition: color 0.2s, transform 0.2s;
         }
-
         .btn-control:hover { color: var(--primary); transform: scale(1.1); }
 
         .btn-play-pause {
-            width: 90px;
-            height: 90px;
+            width: 75px;
+            height: 75px;
             background: linear-gradient(135deg, var(--primary), var(--secondary));
             border-radius: 50%;
             display: flex;
             justify-content: center;
             align-items: center;
-            font-size: 2.5rem;
+            font-size: 2rem;
             color: #000;
             border: none;
             cursor: pointer;
             box-shadow: 0 10px 30px rgba(0, 242, 254, 0.4);
             transition: transform 0.2s;
         }
-
         .btn-play-pause:hover { transform: scale(1.05); }
-        .btn-stop { color: #ff4d4d; }
-        .btn-stop:hover { color: #ff1a1a; text-shadow: 0 0 15px rgba(255, 77, 77, 0.6); }
+
         #errorMsg { color: #ff4d4d; margin-top: 15px; display: none; font-weight: bold; font-size: 1rem; }
 
-        .mobile-menu-btn {
-            display: none;
-            position: absolute;
-            top: 20px;
-            left: 20px;
-            font-size: 2rem;
-            color: white;
-            z-index: 100;
-            background: none;
-            border: none;
-            text-shadow: 0 2px 10px rgba(0,0,0,0.8);
-        }
-
         @media (max-width: 900px) {
-            .mobile-menu-btn { display: block; }
-            .sidebar {
-                position: absolute;
-                left: -100%;
-                border-right: none;
-                z-index: 50;
-                transition: left 0.3s;
-                width: 300px;
-            }
-            .sidebar.show { left: 0; }
-            .glass-panel { width: 95%; padding: 30px 20px; }
-            .player-info h3 { font-size: 1.5rem; }
+            .sidebar { width: 100%; max-width: 400px; }
         }
     </style>
 </head>
 <body>
 
     <div class="main-content">
-        <button class="mobile-menu-btn" onclick="toggleSidebar()"><i class="fas fa-bars"></i></button>
+        <!-- زر القائمة الثلاث نقاط -->
+        <button class="menu-btn" onclick="toggleSidebar()"><i class="fas fa-ellipsis-v"></i></button>
+
+        <!-- الأزرار العلوية يمين -->
+        <div class="top-actions">
+            <button class="action-btn" onclick="toggleSleepTimer()" title="مؤقت النوم">
+                <i class="fas fa-stopwatch"></i>
+                <span id="sleepBadge" class="badge" style="display:none;">30</span>
+            </button>
+            <button class="action-btn btn-stop" onclick="stopRadio()" title="إيقاف تام">
+                <i class="fas fa-power-off"></i>
+            </button>
+        </div>
 
         <aside class="sidebar" id="sidebar">
-            <div class="sidebar-header">
-                <h2 id="currentCategoryTitle">القرآن الكريم</h2>
-            </div>
+            <button class="close-sidebar" onclick="toggleSidebar()"><i class="fas fa-times"></i></button>
             
             <div class="dropdown-container">
+                <div class="dropdown-label"><i class="fas fa-list-ul"></i> اختر القسم الرئيسي:</div>
                 <select id="categorySelect" class="category-dropdown" onchange="handleCategoryChange()">
-                    <!-- الأقسام تُضاف هنا برمجياً -->
+                    <!-- الأقسام تُضاف هنا -->
                 </select>
             </div>
             
@@ -282,20 +337,20 @@
                     <p id="errorMsg">الإذاعة لا تستجيب، تأكد من اتصالك</p>
                 </div>
 
+                <!-- أزرار التحكم بالترتيب المطلوب (صوت - التالي - تشغيل - تكبير) -->
                 <div class="main-controls">
-                    <button class="btn-control btn-stop" onclick="stopRadio()" title="إيقاف تام">
-                        <i class="fas fa-power-off"></i>
+                    <button class="btn-control" onclick="toggleMute()" title="كتم الصوت">
+                        <i id="muteIcon" class="fas fa-volume-up"></i>
                     </button>
                     
+                    <button class="btn-control" onclick="playNextStation()" title="المحطة القادمة">
+                        <i class="fas fa-step-forward"></i>
+                    </button>
+
                     <button class="btn-play-pause" id="playPauseBtn" onclick="togglePlay()">
                         <i id="playIcon" class="fas fa-play"></i>
                     </button>
                     
-                    <button class="btn-control" onclick="toggleMute()" title="كتم الصوت">
-                        <i id="muteIcon" class="fas fa-volume-up"></i>
-                    </button>
-
-                    <!-- زر تكبير الشاشة الجديد -->
                     <button class="btn-control" onclick="toggleFullScreen()" title="ملء الشاشة">
                         <i id="expandIcon" class="fas fa-expand"></i>
                     </button>
@@ -534,7 +589,6 @@
 
         const categorySelect = document.getElementById('categorySelect');
         const stationsContainer = document.getElementById('stationsContainer');
-        const currentCategoryTitle = document.getElementById('currentCategoryTitle');
         const audioPlayer = document.getElementById('audioPlayer');
         const mainStationName = document.getElementById('mainStationName');
         const mainStatusText = document.getElementById('mainStatusText');
@@ -542,8 +596,15 @@
         const errorMsg = document.getElementById('errorMsg');
         const sidebar = document.getElementById('sidebar');
 
+        let currentCategoryName = '';
+        let currentStationIndex = -1;
         let currentPlayingCard = null;
         let hlsInstance = null; 
+
+        // مؤقت النوم
+        let sleepTimerObj = null;
+        const sleepMinutesList = [0, 30, 60, 90, 120, 150, 180];
+        let currentSleepIndex = 0;
 
         function initDropdown() {
             Object.keys(radioData).forEach((categoryName) => {
@@ -562,26 +623,23 @@
         }
 
         function loadCategory(categoryName) {
-            currentCategoryTitle.textContent = categoryName;
+            currentCategoryName = categoryName;
             stationsContainer.innerHTML = '';
 
             const stations = radioData[categoryName];
-            stations.forEach(station => {
+            stations.forEach((station, index) => {
                 const card = document.createElement('div');
                 card.className = 'station-card';
                 card.innerHTML = `<h3>${station.name}</h3> <i class="fas fa-play play-icon"></i>`;
-                card.onclick = () => playStation(station, card);
+                card.onclick = () => playStation(station, card, index);
                 stationsContainer.appendChild(card);
             });
-            
-            if(window.innerWidth <= 900 && !sidebar.classList.contains('show')) {
-                sidebar.classList.add('show');
-            }
         }
 
-        function playStation(station, cardElement) {
+        function playStation(station, cardElement, index) {
             errorMsg.style.display = 'none';
             mainStatusText.textContent = "جاري الاتصال...";
+            currentStationIndex = index;
 
             document.querySelectorAll('.station-card').forEach(c => {
                 c.classList.remove('playing');
@@ -595,7 +653,8 @@
             mainStationName.textContent = station.name;
             playIcon.className = 'fas fa-spinner fa-spin'; 
 
-            if(window.innerWidth <= 900) { sidebar.classList.remove('show'); }
+            // إخفاء القائمة تلقائياً بمجرد اختيار الإذاعة (لجميع الشاشات)
+            sidebar.classList.remove('show'); 
 
             if (hlsInstance) { hlsInstance.destroy(); hlsInstance = null; }
 
@@ -646,6 +705,18 @@
             }
         }
 
+        function playNextStation() {
+            if (!currentCategoryName || currentStationIndex === -1) return;
+            const stations = radioData[currentCategoryName];
+            const nextIndex = (currentStationIndex + 1) % stations.length;
+            const nextStation = stations[nextIndex];
+            
+            const allCards = document.querySelectorAll('.station-card');
+            const nextCard = allCards[nextIndex];
+            
+            playStation(nextStation, nextCard, nextIndex);
+        }
+
         function stopRadio() {
             if (hlsInstance) { hlsInstance.destroy(); hlsInstance = null; }
             audioPlayer.pause();
@@ -678,31 +749,43 @@
             const expandIcon = document.getElementById('expandIcon');
 
             if (!document.fullscreenElement) {
-                if (playerElement.requestFullscreen) {
-                    playerElement.requestFullscreen();
-                } else if (playerElement.webkitRequestFullscreen) {
-                    playerElement.webkitRequestFullscreen();
-                } else if (playerElement.msRequestFullscreen) {
-                    playerElement.msRequestFullscreen();
-                }
+                if (playerElement.requestFullscreen) playerElement.requestFullscreen();
+                else if (playerElement.webkitRequestFullscreen) playerElement.webkitRequestFullscreen();
+                else if (playerElement.msRequestFullscreen) playerElement.msRequestFullscreen();
             } else {
-                if (document.exitFullscreen) {
-                    document.exitFullscreen();
-                } else if (document.webkitExitFullscreen) {
-                    document.webkitExitFullscreen();
-                } else if (document.msExitFullscreen) {
-                    document.msExitFullscreen();
-                }
+                if (document.exitFullscreen) document.exitFullscreen();
+                else if (document.webkitExitFullscreen) document.webkitExitFullscreen();
+                else if (document.msExitFullscreen) document.msExitFullscreen();
+            }
+        }
+
+        function toggleSleepTimer() {
+            currentSleepIndex = (currentSleepIndex + 1) % sleepMinutesList.length;
+            const mins = sleepMinutesList[currentSleepIndex];
+            const badge = document.getElementById('sleepBadge');
+
+            if (sleepTimerObj) clearTimeout(sleepTimerObj);
+
+            if (mins === 0) {
+                badge.style.display = 'none';
+                if(currentPlayingCard) mainStatusText.textContent = "يتم التشغيل الآن";
+                else mainStatusText.textContent = "اختر إذاعة للبدء";
+            } else {
+                badge.style.display = 'block';
+                badge.textContent = mins;
+                mainStatusText.textContent = `سيتم الإيقاف بعد ${mins} دقيقة`;
+                sleepTimerObj = setTimeout(() => {
+                    stopRadio();
+                    currentSleepIndex = 0;
+                    badge.style.display = 'none';
+                }, mins * 60 * 1000);
             }
         }
 
         document.addEventListener('fullscreenchange', () => {
             const expandIcon = document.getElementById('expandIcon');
-            if (!document.fullscreenElement) {
-                expandIcon.className = 'fas fa-expand';
-            } else {
-                expandIcon.className = 'fas fa-compress';
-            }
+            if (!document.fullscreenElement) expandIcon.className = 'fas fa-expand';
+            else expandIcon.className = 'fas fa-compress';
         });
 
         audioPlayer.addEventListener('error', handleError);
