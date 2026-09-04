@@ -45,7 +45,7 @@
             position: relative;
         }
 
-        /* زر القائمة الجانبية (الثلاث نقاط في الشمال) */
+        /* أيقونة القائمة الجديدة */
         .menu-btn {
             position: absolute;
             top: 20px;
@@ -61,7 +61,7 @@
         }
         .menu-btn:hover { color: var(--primary); }
 
-        /* الأزرار العلوية يمين (إيقاف ومؤقت النوم) */
+        /* الأزرار العلوية يمين */
         .top-actions {
             position: absolute;
             top: 20px;
@@ -119,33 +119,39 @@
         }
         .sidebar.show { left: 0; }
 
-        .close-sidebar {
-            position: absolute;
-            top: 15px;
-            right: 15px;
-            background: none;
-            border: none;
-            color: white;
-            font-size: 1.5rem;
-            cursor: pointer;
-            transition: color 0.2s;
-        }
-        .close-sidebar:hover { color: #ff4d4d; }
-
         .dropdown-container {
-            padding: 40px 20px 20px 20px;
+            padding: 20px 20px 20px 20px;
             border-bottom: 2px solid var(--primary);
         }
-        
+
+        /* ترتيب علامة الاكس والقسم الرئيسي */
+        .dropdown-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+
         .dropdown-label {
             display: flex;
             align-items: center;
             gap: 8px;
             color: #d1d5db;
             font-weight: bold;
-            margin-bottom: 10px;
             font-size: 1.1rem;
         }
+
+        .close-sidebar {
+            background: none;
+            border: none;
+            color: white;
+            font-size: 1.6rem;
+            cursor: pointer;
+            transition: color 0.2s;
+            display: flex;
+            align-items: center;
+        }
+        .close-sidebar:hover { color: #ff4d4d; }
 
         .category-dropdown {
             width: 100%;
@@ -300,25 +306,27 @@
 <body>
 
     <div class="main-content">
-        <!-- زر القائمة الثلاث نقاط -->
-        <button class="menu-btn" onclick="toggleSidebar()"><i class="fas fa-ellipsis-v"></i></button>
+        <!-- زر القائمة الأنيق الجديد -->
+        <button class="menu-btn" onclick="toggleSidebar()"><i class="fas fa-bars-staggered"></i></button>
 
-        <!-- الأزرار العلوية يمين -->
+        <!-- الأزرار العلوية يمين (إيقاف تام ثم Sleep) -->
         <div class="top-actions">
+            <button class="action-btn btn-stop" onclick="stopRadio()" title="إيقاف تام">
+                <i class="fas fa-power-off"></i>
+            </button>
             <button class="action-btn" onclick="toggleSleepTimer()" title="مؤقت النوم">
                 <i class="fas fa-stopwatch"></i>
                 <span id="sleepBadge" class="badge" style="display:none;">30</span>
             </button>
-            <button class="action-btn btn-stop" onclick="stopRadio()" title="إيقاف تام">
-                <i class="fas fa-power-off"></i>
-            </button>
         </div>
 
         <aside class="sidebar" id="sidebar">
-            <button class="close-sidebar" onclick="toggleSidebar()"><i class="fas fa-times"></i></button>
-            
             <div class="dropdown-container">
-                <div class="dropdown-label"><i class="fas fa-list-ul"></i> اختر القسم الرئيسي:</div>
+                <!-- علامة الاكس والقسم الرئيسي في نفس السطر -->
+                <div class="dropdown-header">
+                    <div class="dropdown-label"><i class="fas fa-list-ul"></i> اختر القسم الرئيسي:</div>
+                    <button class="close-sidebar" onclick="toggleSidebar()"><i class="fas fa-times"></i></button>
+                </div>
                 <select id="categorySelect" class="category-dropdown" onchange="handleCategoryChange()">
                     <!-- الأقسام تُضاف هنا -->
                 </select>
@@ -337,7 +345,7 @@
                     <p id="errorMsg">الإذاعة لا تستجيب، تأكد من اتصالك</p>
                 </div>
 
-                <!-- أزرار التحكم بالترتيب المطلوب (صوت - التالي - تشغيل - تكبير) -->
+                <!-- أزرار التحكم بالترتيب المطلوب (صوت - التالي - تشغيل - السابق - تكبير) -->
                 <div class="main-controls">
                     <button class="btn-control" onclick="toggleMute()" title="كتم الصوت">
                         <i id="muteIcon" class="fas fa-volume-up"></i>
@@ -349,6 +357,10 @@
 
                     <button class="btn-play-pause" id="playPauseBtn" onclick="togglePlay()">
                         <i id="playIcon" class="fas fa-play"></i>
+                    </button>
+                    
+                    <button class="btn-control" onclick="playPrevStation()" title="المحطة السابقة">
+                        <i class="fas fa-step-backward"></i>
                     </button>
                     
                     <button class="btn-control" onclick="toggleFullScreen()" title="ملء الشاشة">
@@ -653,9 +665,6 @@
             mainStationName.textContent = station.name;
             playIcon.className = 'fas fa-spinner fa-spin'; 
 
-            // إخفاء القائمة تلقائياً بمجرد اختيار الإذاعة (لجميع الشاشات)
-            sidebar.classList.remove('show'); 
-
             if (hlsInstance) { hlsInstance.destroy(); hlsInstance = null; }
 
             if ((station.url.includes('.m3u8') || station.url.includes('.ts')) && Hls.isSupported()) {
@@ -715,6 +724,19 @@
             const nextCard = allCards[nextIndex];
             
             playStation(nextStation, nextCard, nextIndex);
+        }
+
+        function playPrevStation() {
+            if (!currentCategoryName || currentStationIndex === -1) return;
+            const stations = radioData[currentCategoryName];
+            // الانتقال للمحطة السابقة والعودة للنهاية إذا كان في البداية
+            const prevIndex = (currentStationIndex - 1 + stations.length) % stations.length;
+            const prevStation = stations[prevIndex];
+            
+            const allCards = document.querySelectorAll('.station-card');
+            const prevCard = allCards[prevIndex];
+            
+            playStation(prevStation, prevCard, prevIndex);
         }
 
         function stopRadio() {
