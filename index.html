@@ -14,6 +14,7 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     
     <script src="https://cdn.jsdelivr.net/npm/hls.js@latest"></script>
+    <script src="podcasts.js"></script>
 
     <style>
         :root {
@@ -282,9 +283,18 @@
         .player-info h3 {
             font-size: 1.8rem;
             color: #ffffff;
-            margin-bottom: 12px;
+            margin-bottom: 5px;
             text-shadow: 0 4px 10px rgba(0,0,0,0.5);
             font-weight: 900;
+        }
+
+        .episode-title {
+            color: #e2e8f0;
+            font-size: 1.1rem;
+            margin-bottom: 12px;
+            font-weight: normal;
+            font-style: italic;
+            display: none;
         }
 
         .player-info p {
@@ -368,8 +378,7 @@
                     <button class="close-sidebar" onclick="toggleSidebar()"><i class="fas fa-times"></i></button>
                 </div>
                 <select id="categorySelect" class="category-dropdown" onchange="handleCategoryChange()">
-                    <!-- الأقسام تُضاف هنا -->
-                </select>
+                    </select>
             </div>
             
             <div class="stations-container" id="stationsContainer"></div>
@@ -378,9 +387,10 @@
         <main class="main-player" id="mainBg">
             <div class="overlay"></div>
             
-            <div class="glass-panel">
+            <div class="glass-panel" id="glassPanel">
                 <div class="player-info">
                     <h3 id="mainStationName">Esma3 Fm</h3>
+                    <div id="episodeName" class="episode-title"></div>
                     <p id="mainStatusText">اختر إذاعة للبدء</p>
                     <p id="errorMsg">الإذاعة لا تستجيب، تأكد من اتصالك</p>
                 </div>
@@ -548,8 +558,8 @@
             "إسلاميات": [
                 { name: "أذكار الصباح", url: "https://qurango.net/radio/athkar_sabah" },
                 { name: "أذكار المساء", url: "https://qurango.net/radio/athkar_masa" },
-                { name: "الشيخ سيد النقشبندي", url: "https://stream.zeno.fm/s0vc98c0pnhvv" },
-                { name: "الشيخ نصر الدين طوبار", url: "https://stream.zeno.fm/e15ed2m0pnhvv" },
+                { name: "إذاعة ابتهالات الشيخ سيد النقشبندي", url: "https://stream.zeno.fm/s0vc98c0pnhvv" },
+                { name: "إذاعة ابتهالات الشيخ نصر الدين طوبار", url: "https://stream.zeno.fm/e15ed2m0pnhvv" },
                 { name: "نور على نور", url: "http://104.7.66.64:8011/;?icy=http" },
                 { name: "السلام إف إم", url: "https://stream-157.zeno.fm/hv3uuw9avuhvv?zt=eyJhbGciOiJIUzI1NiJ9" },
                 { name: "الشيخ الشعراوي", url: "https://stream-175.zeno.fm/guuggdfrvssuv" },
@@ -618,6 +628,7 @@
                 { name: "محمد محيي", url: "https://stream-170.zeno.fm/gql4tcwrrxgtv" },
             ],
             "ثقافة ودراما": [
+                { name: "رحلة في الذاكرة", isRandom: true, getList: () => (typeof memoryJourneyEpisodes !== 'undefined' ? memoryJourneyEpisodes : []) },
                 { name: "راديو طبيب", url: "https://stream-174.zeno.fm/z6exeh5qc0hvv" },
                 { name: "مصطفى محمود", url: "https://stream-173.zeno.fm/t3azszm0pnhvv" },
                 { name: "أحمد خالد توفيق", url: "https://stream-179.zeno.fm/qbkzrtpwsgquv" },
@@ -640,6 +651,7 @@
         const stationsContainer = document.getElementById('stationsContainer');
         const audioPlayer = document.getElementById('audioPlayer');
         const mainStationName = document.getElementById('mainStationName');
+        const episodeName = document.getElementById('episodeName');
         const mainStatusText = document.getElementById('mainStatusText');
         const playIcon = document.getElementById('playIcon');
         const errorMsg = document.getElementById('errorMsg');
@@ -685,6 +697,7 @@
         function playStation(station, cardElement, index) {
             errorMsg.style.display = 'none';
             mainStatusText.textContent = "جاري الاتصال...";
+            episodeName.style.display = 'none';
             currentStationIndex = index;
 
             document.querySelectorAll('.station-card').forEach(c => {
@@ -692,18 +705,41 @@
                 c.querySelector('.play-icon').className = 'fas fa-play play-icon';
             });
             
-            cardElement.classList.add('playing');
-            cardElement.querySelector('.play-icon').className = 'fas fa-music play-icon'; 
-            currentPlayingCard = cardElement;
+            if (cardElement) {
+                cardElement.classList.add('playing');
+                cardElement.querySelector('.play-icon').className = 'fas fa-music play-icon'; 
+                currentPlayingCard = cardElement;
+            }
             
             mainStationName.textContent = station.name;
             playIcon.className = 'fas fa-spinner fa-spin'; 
 
             if (hlsInstance) { hlsInstance.destroy(); hlsInstance = null; }
 
-            if ((station.url.includes('.m3u8') || station.url.includes('.ts')) && Hls.isSupported()) {
+            let targetUrl = station.url;
+            
+            if (station.isRandom) {
+                const epList = station.getList ? station.getList() : [];
+                if (epList.length > 0) {
+                    const randomIndex = Math.floor(Math.random() * epList.length);
+                    const randomEpisode = epList[randomIndex];
+                    
+                    targetUrl = randomEpisode.url;
+                    
+                    episodeName.textContent = randomEpisode.name;
+                    episodeName.style.display = 'block';
+
+                    audioPlayer.onended = function() {
+                        playStation(station, currentPlayingCard, index); 
+                    };
+                }
+            } else {
+                audioPlayer.onended = null;
+            }
+
+            if (targetUrl && (targetUrl.includes('.m3u8') || targetUrl.includes('.ts')) && Hls.isSupported()) {
                 hlsInstance = new Hls({ enableWorker: true, lowLatencyMode: true });
-                hlsInstance.loadSource(station.url);
+                hlsInstance.loadSource(targetUrl);
                 hlsInstance.attachMedia(audioPlayer);
                 hlsInstance.on(Hls.Events.MANIFEST_PARSED, function() {
                     audioPlayer.play().then(onPlaySuccess).catch(handleError);
@@ -715,9 +751,11 @@
                         else handleError();
                     }
                 });
-            } else {
-                audioPlayer.src = station.url;
+            } else if (targetUrl) {
+                audioPlayer.src = targetUrl;
                 audioPlayer.play().then(onPlaySuccess).catch(handleError);
+            } else {
+                handleError();
             }
         }
 
@@ -732,6 +770,9 @@
             mainStatusText.textContent = "فشل التشغيل";
             errorMsg.style.display = 'block';
             if (currentPlayingCard) currentPlayingCard.querySelector('.play-icon').className = 'fas fa-play play-icon';
+            if(audioPlayer.onended) {
+                setTimeout(audioPlayer.onended, 2000);
+            }
         }
 
         function togglePlay() {
@@ -751,6 +792,12 @@
         function playNextStation() {
             if (!currentCategoryName || currentStationIndex === -1) return;
             const stations = radioData[currentCategoryName];
+            
+            if(stations[currentStationIndex].isRandom) {
+                playStation(stations[currentStationIndex], currentPlayingCard, currentStationIndex);
+                return;
+            }
+
             const nextIndex = (currentStationIndex + 1) % stations.length;
             const nextStation = stations[nextIndex];
             
@@ -763,6 +810,12 @@
         function playPrevStation() {
             if (!currentCategoryName || currentStationIndex === -1) return;
             const stations = radioData[currentCategoryName];
+            
+            if(stations[currentStationIndex].isRandom) {
+                playStation(stations[currentStationIndex], currentPlayingCard, currentStationIndex);
+                return;
+            }
+
             const prevIndex = (currentStationIndex - 1 + stations.length) % stations.length;
             const prevStation = stations[prevIndex];
             
@@ -777,9 +830,11 @@
             audioPlayer.pause();
             audioPlayer.removeAttribute('src'); 
             audioPlayer.load(); 
+            audioPlayer.onended = null;
 
             playIcon.className = 'fas fa-play';
             mainStationName.textContent = 'Esma3 Fm';
+            episodeName.style.display = 'none';
             mainStatusText.textContent = 'تم إيقاف التشغيل (توفير البيانات)';
             errorMsg.style.display = 'none';
 
@@ -846,7 +901,6 @@
                 dropdown.classList.remove('show');
             }
 
-            // إغلاق القائمة الجانبية فقط عند الضغط على المساحة الفاضية في الخلفية
             const sidebar = document.getElementById('sidebar');
             const glassPanel = document.querySelector('.glass-panel');
             const menuBtn = document.querySelector('.menu-btn');
