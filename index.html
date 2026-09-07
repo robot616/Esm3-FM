@@ -14,6 +14,7 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     
     <script src="https://cdn.jsdelivr.net/npm/hls.js@latest"></script>
+    <script src="podcasts.js"></script>
 
     <style>
         :root {
@@ -394,9 +395,9 @@
                     <p id="errorMsg">الإذاعة لا تستجيب، تأكد من اتصالك</p>
                 </div>
 
-                <div class="main-controls">
-                    <button class="btn-control" onclick="toggleMute()" title="كتم الصوت">
-                        <i id="muteIcon" class="fas fa-volume-up"></i>
+                <div class="main-controls" dir="ltr">
+                    <button class="btn-control" onclick="toggleFullScreen()" title="ملء الشاشة">
+                        <i id="expandIcon" class="fas fa-expand"></i>
                     </button>
                     
                     <button class="btn-control" onclick="handlePrev()" title="المحطة السابقة">
@@ -410,9 +411,9 @@
                     <button class="btn-control" onclick="handleNext()" title="المحطة القادمة">
                         <i class="fas fa-step-forward"></i>
                     </button>
-                    
-                    <button class="btn-control" onclick="toggleFullScreen()" title="ملء الشاشة">
-                        <i id="expandIcon" class="fas fa-expand"></i>
+
+                    <button class="btn-control" onclick="toggleMute()" title="كتم الصوت">
+                        <i id="muteIcon" class="fas fa-volume-up"></i>
                     </button>
                 </div>
             </div>
@@ -699,7 +700,6 @@
             });
         }
 
-        // معالجة النقر على المحطة القادمة (نقرة واحدة = حلقة عشوائية، نقرتين = محطة تالية)
         function handleNext() {
             if (nextClickTimer) {
                 clearTimeout(nextClickTimer);
@@ -709,11 +709,10 @@
                 nextClickTimer = setTimeout(() => {
                     nextClickTimer = null;
                     playNextStation();
-                }, 250);
+                }, 300);
             }
         }
 
-        // معالجة النقر على المحطة السابقة (نقرة واحدة = حلقة سابقة بالذاكرة، نقرتين = محطة سابقة)
         function handlePrev() {
             if (prevClickTimer) {
                 clearTimeout(prevClickTimer);
@@ -723,7 +722,7 @@
                 prevClickTimer = setTimeout(() => {
                     prevClickTimer = null;
                     playPrevStation();
-                }, 250);
+                }, 300);
             }
         }
 
@@ -754,7 +753,6 @@
             const stations = radioData[currentCategoryName];
             
             if(stations[currentStationIndex].isRandom) {
-                // سحب حلقة عشوائية جديدة
                 playStation(stations[currentStationIndex], currentPlayingCard, currentStationIndex);
             } else {
                 forceNextStation();
@@ -766,7 +764,6 @@
             const stations = radioData[currentCategoryName];
             
             if(stations[currentStationIndex].isRandom) {
-                // الرجوع لنفس الحلقة السابقة
                 if (randomHistory.length > 0) {
                     const prevEp = randomHistory.pop();
                     playStation(stations[currentStationIndex], currentPlayingCard, currentStationIndex, prevEp, true);
@@ -783,7 +780,6 @@
             mainStatusText.textContent = "جاري الاتصال...";
             episodeName.style.display = 'none';
             
-            // تصفير الذاكرة لو انتقلت لمحطة مختلفة من القائمة الجانبية
             if (currentStationIndex !== index && !isGoingBack) {
                 randomHistory = [];
                 currentEpisodeObj = null;
@@ -815,11 +811,9 @@
                     let episodeToPlay = specificEpisode;
 
                     if (!episodeToPlay) {
-                        // اختيار حلقة عشوائية
                         const randomIndex = Math.floor(Math.random() * epList.length);
                         episodeToPlay = epList[randomIndex];
                         
-                        // حفظ الحلقة اللي كانت شغالة في الذاكرة لو مكناش بنعمل (رجوع)
                         if (currentEpisodeObj && !isGoingBack) {
                             randomHistory.push(currentEpisodeObj);
                         }
@@ -971,7 +965,6 @@
                 dropdown.classList.remove('show');
             }
 
-            // إغلاق القائمة الجانبية فقط عند الضغط على المساحة الفاضية في الخلفية
             const sidebar = document.getElementById('sidebar');
             const glassPanel = document.querySelector('.glass-panel');
             const menuBtn = document.querySelector('.menu-btn');
