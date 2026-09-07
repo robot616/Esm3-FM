@@ -14,7 +14,6 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     
     <script src="https://cdn.jsdelivr.net/npm/hls.js@latest"></script>
-    <script src="podcasts.js"></script>
 
     <style>
         :root {
@@ -400,16 +399,16 @@
                         <i id="muteIcon" class="fas fa-volume-up"></i>
                     </button>
                     
-                    <button class="btn-control" onclick="playNextStation()" title="المحطة القادمة">
-                        <i class="fas fa-step-forward"></i>
+                    <button class="btn-control" onclick="handlePrev()" title="المحطة السابقة">
+                        <i class="fas fa-step-backward"></i>
                     </button>
 
                     <button class="btn-play-pause" id="playPauseBtn" onclick="togglePlay()">
                         <i id="playIcon" class="fas fa-play"></i>
                     </button>
                     
-                    <button class="btn-control" onclick="playPrevStation()" title="المحطة السابقة">
-                        <i class="fas fa-step-backward"></i>
+                    <button class="btn-control" onclick="handleNext()" title="المحطة القادمة">
+                        <i class="fas fa-step-forward"></i>
                     </button>
                     
                     <button class="btn-control" onclick="toggleFullScreen()" title="ملء الشاشة">
@@ -664,6 +663,12 @@
 
         let sleepTimerObj = null;
 
+        // متغيرات للتحكم في البودكاست والنقرات
+        let randomHistory = [];
+        let currentEpisodeObj = null;
+        let nextClickTimer = null;
+        let prevClickTimer = null;
+
         function initDropdown() {
             Object.keys(radioData).forEach((categoryName) => {
                 const option = document.createElement('option');
@@ -694,10 +699,96 @@
             });
         }
 
-        function playStation(station, cardElement, index) {
+        // معالجة النقر على المحطة القادمة (نقرة واحدة = حلقة عشوائية، نقرتين = محطة تالية)
+        function handleNext() {
+            if (nextClickTimer) {
+                clearTimeout(nextClickTimer);
+                nextClickTimer = null;
+                forceNextStation();
+            } else {
+                nextClickTimer = setTimeout(() => {
+                    nextClickTimer = null;
+                    playNextStation();
+                }, 250);
+            }
+        }
+
+        // معالجة النقر على المحطة السابقة (نقرة واحدة = حلقة سابقة بالذاكرة، نقرتين = محطة سابقة)
+        function handlePrev() {
+            if (prevClickTimer) {
+                clearTimeout(prevClickTimer);
+                prevClickTimer = null;
+                forcePrevStation();
+            } else {
+                prevClickTimer = setTimeout(() => {
+                    prevClickTimer = null;
+                    playPrevStation();
+                }, 250);
+            }
+        }
+
+        function forceNextStation() {
+            if (!currentCategoryName || currentStationIndex === -1) return;
+            const stations = radioData[currentCategoryName];
+            const nextIndex = (currentStationIndex + 1) % stations.length;
+            playRealStationByIndex(nextIndex);
+        }
+
+        function forcePrevStation() {
+            if (!currentCategoryName || currentStationIndex === -1) return;
+            const stations = radioData[currentCategoryName];
+            const prevIndex = (currentStationIndex - 1 + stations.length) % stations.length;
+            playRealStationByIndex(prevIndex);
+        }
+
+        function playRealStationByIndex(index) {
+            const stations = radioData[currentCategoryName];
+            const nextStation = stations[index];
+            const allCards = document.querySelectorAll('.station-card');
+            const nextCard = allCards[index];
+            playStation(nextStation, nextCard, index);
+        }
+
+        function playNextStation() {
+            if (!currentCategoryName || currentStationIndex === -1) return;
+            const stations = radioData[currentCategoryName];
+            
+            if(stations[currentStationIndex].isRandom) {
+                // سحب حلقة عشوائية جديدة
+                playStation(stations[currentStationIndex], currentPlayingCard, currentStationIndex);
+            } else {
+                forceNextStation();
+            }
+        }
+
+        function playPrevStation() {
+            if (!currentCategoryName || currentStationIndex === -1) return;
+            const stations = radioData[currentCategoryName];
+            
+            if(stations[currentStationIndex].isRandom) {
+                // الرجوع لنفس الحلقة السابقة
+                if (randomHistory.length > 0) {
+                    const prevEp = randomHistory.pop();
+                    playStation(stations[currentStationIndex], currentPlayingCard, currentStationIndex, prevEp, true);
+                } else {
+                    forcePrevStation();
+                }
+            } else {
+                forcePrevStation();
+            }
+        }
+
+        function playStation(station, cardElement, index, specificEpisode = null, isGoingBack = false) {
             errorMsg.style.display = 'none';
             mainStatusText.textContent = "جاري الاتصال...";
             episodeName.style.display = 'none';
+            
+            // تصفير الذاكرة لو انتقلت لمحطة مختلفة من القائمة الجانبية
+            if (currentStationIndex !== index && !isGoingBack) {
+                randomHistory = [];
+                currentEpisodeObj = null;
+            }
+
             currentStationIndex = index;
 
             document.querySelectorAll('.station-card').forEach(c => {
@@ -721,12 +812,23 @@
             if (station.isRandom) {
                 const epList = station.getList ? station.getList() : [];
                 if (epList.length > 0) {
-                    const randomIndex = Math.floor(Math.random() * epList.length);
-                    const randomEpisode = epList[randomIndex];
+                    let episodeToPlay = specificEpisode;
+
+                    if (!episodeToPlay) {
+                        // اختيار حلقة عشوائية
+                        const randomIndex = Math.floor(Math.random() * epList.length);
+                        episodeToPlay = epList[randomIndex];
+                        
+                        // حفظ الحلقة اللي كانت شغالة في الذاكرة لو مكناش بنعمل (رجوع)
+                        if (currentEpisodeObj && !isGoingBack) {
+                            randomHistory.push(currentEpisodeObj);
+                        }
+                    }
+
+                    currentEpisodeObj = episodeToPlay;
+                    targetUrl = episodeToPlay.url;
                     
-                    targetUrl = randomEpisode.url;
-                    
-                    episodeName.textContent = randomEpisode.name;
+                    episodeName.textContent = episodeToPlay.name;
                     episodeName.style.display = 'block';
 
                     audioPlayer.onended = function() {
@@ -735,6 +837,8 @@
                 }
             } else {
                 audioPlayer.onended = null;
+                currentEpisodeObj = null;
+                randomHistory = [];
             }
 
             if (targetUrl && (targetUrl.includes('.m3u8') || targetUrl.includes('.ts')) && Hls.isSupported()) {
@@ -789,48 +893,14 @@
             }
         }
 
-        function playNextStation() {
-            if (!currentCategoryName || currentStationIndex === -1) return;
-            const stations = radioData[currentCategoryName];
-            
-            if(stations[currentStationIndex].isRandom) {
-                playStation(stations[currentStationIndex], currentPlayingCard, currentStationIndex);
-                return;
-            }
-
-            const nextIndex = (currentStationIndex + 1) % stations.length;
-            const nextStation = stations[nextIndex];
-            
-            const allCards = document.querySelectorAll('.station-card');
-            const nextCard = allCards[nextIndex];
-            
-            playStation(nextStation, nextCard, nextIndex);
-        }
-
-        function playPrevStation() {
-            if (!currentCategoryName || currentStationIndex === -1) return;
-            const stations = radioData[currentCategoryName];
-            
-            if(stations[currentStationIndex].isRandom) {
-                playStation(stations[currentStationIndex], currentPlayingCard, currentStationIndex);
-                return;
-            }
-
-            const prevIndex = (currentStationIndex - 1 + stations.length) % stations.length;
-            const prevStation = stations[prevIndex];
-            
-            const allCards = document.querySelectorAll('.station-card');
-            const prevCard = allCards[prevIndex];
-            
-            playStation(prevStation, prevCard, prevIndex);
-        }
-
         function stopRadio() {
             if (hlsInstance) { hlsInstance.destroy(); hlsInstance = null; }
             audioPlayer.pause();
             audioPlayer.removeAttribute('src'); 
             audioPlayer.load(); 
             audioPlayer.onended = null;
+            currentEpisodeObj = null;
+            randomHistory = [];
 
             playIcon.className = 'fas fa-play';
             mainStationName.textContent = 'Esma3 Fm';
@@ -901,6 +971,7 @@
                 dropdown.classList.remove('show');
             }
 
+            // إغلاق القائمة الجانبية فقط عند الضغط على المساحة الفاضية في الخلفية
             const sidebar = document.getElementById('sidebar');
             const glassPanel = document.querySelector('.glass-panel');
             const menuBtn = document.querySelector('.menu-btn');
