@@ -400,8 +400,7 @@
                         <i id="muteIcon" class="fas fa-volume-up"></i>
                     </button>
                     
-                    <!-- تم تغيير الأمر هنا إلى handleNext والمسمى إلى المحطة القادمة -->
-                    <button class="btn-control" onclick="handleNext()" title="المحطة القادمة">
+                    <button class="btn-control" onclick="handlePrev()" title="المحطة السابقة">
                         <i class="fas fa-step-forward"></i>
                     </button>
 
@@ -409,8 +408,7 @@
                         <i id="playIcon" class="fas fa-play"></i>
                     </button>
                     
-                    <!-- تم تغيير الأمر هنا إلى handlePrev والمسمى إلى المحطة السابقة -->
-                    <button class="btn-control" onclick="handlePrev()" title="المحطة السابقة">
+                    <button class="btn-control" onclick="handleNext()" title="المحطة القادمة">
                         <i class="fas fa-step-backward"></i>
                     </button>
                     
@@ -558,8 +556,8 @@
             "إسلاميات": [
                 { name: "أذكار الصباح", url: "https://qurango.net/radio/athkar_sabah" },
                 { name: "أذكار المساء", url: "https://qurango.net/radio/athkar_masa" },
-                { name: "الشيخ سيد النقشبندي", url: "https://stream.zeno.fm/s0vc98c0pnhvv" },
-                { name: "الشيخ نصر الدين طوبار", url: "https://stream.zeno.fm/e15ed2m0pnhvv" },
+                { name: "إذاعة ابتهالات الشيخ سيد النقشبندي", url: "https://stream.zeno.fm/s0vc98c0pnhvv" },
+                { name: "إذاعة ابتهالات الشيخ نصر الدين طوبار", url: "https://stream.zeno.fm/e15ed2m0pnhvv" },
                 { name: "السلام إف إم", url: "https://stream-157.zeno.fm/hv3uuw9avuhvv?zt=eyJhbGciOiJIUzI1NiJ9" },
                 { name: "الشيخ الشعراوي", url: "https://stream-175.zeno.fm/guuggdfrvssuv" },
                 { name: "المختصر في تفسير القرآن", url: "https://qurango.net/radio/mukhtasartafsir" },
@@ -596,6 +594,7 @@
                 { name: "نسائم سوريا", url: "https://stream-166.zeno.fm/z15eg3k7gxquv" },
                 { name: "راديو ستار لبنان", url: "https://stream-156.zeno.fm/qv4bv7t3afhvv" },
                 { name: "أغاني أغاني", url: "https://streaming.nrjaudio.fm/ou6pfgxp336f" },
+                { name: "راديو أنغام", url: "http://streamer.mada.ps:8010/ANGHAM" },
                 { name: "أهل القصيد", url: "https://radio-ahlalqaseedfm.mbc.net/radio-ahlalqaseedfm.m3u8" },
                 { name: "ميكس إف إم السعودية", url: "https://s1.voscast.com:11377/live.mp3" },
                 { name: "إم بي سي مود", url: "https://radio-mbc-mood.mbc.net/radio-mbc-mood.m3u8" },
@@ -620,7 +619,7 @@
                 { name: "دياب إف إم", url: "https://stream.zeno.fm/rf64mx02qa0uv" },
                 { name: "عمرو دياب إف إم", url: "https://stream-153.zeno.fm/xa4yhh4k838uv" },
                 { name: "راديو دياب", url: "https://stream-172.zeno.fm/9t15vs7bkfhvv" },
-                { name: "راديو إليسا", url: "https://stream.zeno.fm/v7n499m8ckhvv" },
+                { name: "راديو إليسا", url: "https://stream-zeno.fm/v7n499m8ckhvv" },
                 { name: "محمد محيي", url: "https://stream-170.zeno.fm/gql4tcwrrxgtv" },
             ],
             "ثقافة ودراما": [
@@ -770,7 +769,56 @@
             }
         }
 
+        // ================= التعديل العبقري هنا =================
         function playStation(station, cardElement, index, specificEpisode = null, isGoingBack = false) {
+            // أولاً: حفظ البيانات في الذاكرة وإجبار الصفحة على التحديث
+            if (!window.isRecovering) {
+                let tempHistory = [...randomHistory];
+                let tempCurrentEp = currentEpisodeObj;
+
+                // لو غيرنا المحطة تماماً، نفضي الذاكرة القديمة
+                if (currentStationIndex !== index && !isGoingBack) {
+                    tempHistory = [];
+                    tempCurrentEp = null;
+                }
+
+                let epToSave = specificEpisode;
+                if (station.isRandom) {
+                    const epList = station.getList ? station.getList() : [];
+                    if (epList.length === 0) {
+                        alert("تنبيه: لم يتم العثور على الحلقات! تأكد أن ملف podcasts.js موجود في نفس المجلد ومحفوظ بالكود الجديد.");
+                        return; // وقف وماتعملش ريفريش
+                    }
+                    if (!epToSave) {
+                        const randomIndex = Math.floor(Math.random() * epList.length);
+                        epToSave = epList[randomIndex];
+                        
+                        if (tempCurrentEp && !isGoingBack) {
+                            tempHistory.push(tempCurrentEp);
+                        }
+                    }
+                }
+
+                // حفظ البيانات في Local Storage
+                localStorage.setItem('savedCategory', currentCategoryName);
+                localStorage.setItem('savedIndex', index);
+                localStorage.setItem('savedIsGoingBack', isGoingBack ? 'true' : 'false');
+                
+                if (epToSave) localStorage.setItem('savedEpisode', JSON.stringify(epToSave));
+                else localStorage.removeItem('savedEpisode');
+                
+                localStorage.setItem('savedHistory', JSON.stringify(tempHistory));
+                localStorage.setItem('triggerPlay', 'true');
+                
+                // عمل ريفريش فوري للصفحة عشان يمسح تحذير المتصفح
+                location.reload();
+                return;
+            }
+            
+            // ثانياً: الكود ده هيتنفذ أول ما الصفحة تفتح من جديد وتقرأ من الذاكرة
+            window.isRecovering = false; 
+            // ================= نهاية التعديل =================
+            
             errorMsg.style.display = 'none';
             mainStatusText.textContent = "جاري الاتصال...";
             episodeName.style.display = 'none';
@@ -803,12 +851,6 @@
             if (station.isRandom) {
                 const epList = station.getList ? station.getList() : [];
                 
-                if (epList.length === 0) {
-                    alert("تنبيه: لم يتم العثور على الحلقات! تأكد أن ملف podcasts.js موجود في نفس المجلد ومحفوظ بالكود الجديد.");
-                    handleError();
-                    return;
-                }
-
                 let episodeToPlay = specificEpisode;
 
                 if (!episodeToPlay) {
@@ -985,7 +1027,53 @@
 
         audioPlayer.addEventListener('error', handleError);
 
-        window.onload = initDropdown;
+        // ================= التعديل العبقري لقرأة الذاكرة عند فتح الصفحة =================
+        window.onload = function() {
+            initDropdown(); // تحميل الأقسام الافتراضية
+            
+            // لو الصفحة بتعمل ريفريش بسبب تشغيل إذاعة
+            if (localStorage.getItem('triggerPlay') === 'true') {
+                localStorage.removeItem('triggerPlay');
+                window.isRecovering = true; // علامة إننا بنسترجع البيانات مش بنعمل كليك جديد
+                
+                const savedCategory = localStorage.getItem('savedCategory');
+                const savedIndex = parseInt(localStorage.getItem('savedIndex'));
+                const savedEpisodeStr = localStorage.getItem('savedEpisode');
+                const savedHistoryStr = localStorage.getItem('savedHistory');
+                const savedIsGoingBack = localStorage.getItem('savedIsGoingBack') === 'true';
+
+                if (savedHistoryStr) {
+                    randomHistory = JSON.parse(savedHistoryStr);
+                    localStorage.removeItem('savedHistory');
+                }
+                
+                let specificEp = null;
+                if (savedEpisodeStr) {
+                    specificEp = JSON.parse(savedEpisodeStr);
+                    localStorage.removeItem('savedEpisode');
+                }
+
+                if (savedCategory && !isNaN(savedIndex)) {
+                    // اختيار القسم الصح في القائمة الجانبية
+                    categorySelect.value = savedCategory;
+                    loadCategory(savedCategory);
+                    
+                    const stations = radioData[savedCategory];
+                    if (stations && stations[savedIndex]) {
+                        const targetStation = stations[savedIndex];
+                        const allCards = document.querySelectorAll('.station-card');
+                        const targetCard = allCards[savedIndex];
+                        
+                        // خدعة: ضبط رقم المحطة عشان ميفضيش الذاكرة تاني
+                        currentStationIndex = savedIndex; 
+                        
+                        // تشغيل الإذاعة فوراً وبدون ريفريش تاني
+                        playStation(targetStation, targetCard, savedIndex, specificEp, savedIsGoingBack);
+                    }
+                }
+            }
+        };
+        // ================= نهاية التعديل =================
     </script>
 </body>
 </html>
