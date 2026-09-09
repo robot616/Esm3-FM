@@ -396,26 +396,26 @@
                 </div>
 
                 <div class="main-controls">
-                    <button class="btn-control" onclick="toggleMute()" title="كتم الصوت">
-                        <i id="muteIcon" class="fas fa-volume-up"></i>
-                    </button>
-                    
-                    <button class="btn-control" onclick="handlePrev()" title="المحطة السابقة">
-                        <i class="fas fa-step-forward"></i>
-                    </button>
+                <button class="btn-control" onclick="toggleMute()" title="كتم الصوت">
+                    <i id="muteIcon" class="fas fa-volume-up"></i>
+                </button>
 
-                    <button class="btn-play-pause" id="playPauseBtn" onclick="togglePlay()">
-                        <i id="playIcon" class="fas fa-play"></i>
-                    </button>
-                    
-                    <button class="btn-control" onclick="handleNext()" title="المحطة القادمة">
-                        <i class="fas fa-step-backward"></i>
-                    </button>
-                    
-                    <button class="btn-control" onclick="toggleFullScreen()" title="ملء الشاشة">
-                        <i id="expandIcon" class="fas fa-expand"></i>
-                    </button>
-                </div>
+                <button class="btn-control" onclick="onNextButtonClicked()" title="المحطة/الحلقة القادمة">
+                    <i class="fas fa-forward-step"></i>
+                </button>
+
+                <button class="btn-play-pause" id="playPauseBtn" onclick="togglePlay()">
+                    <i id="playIcon" class="fas fa-play"></i>
+                </button>
+
+                <button class="btn-control" onclick="onPrevButtonClicked()" title="المحطة/الحلقة السابقة">
+                    <i class="fas fa-backward-step"></i>
+                </button>
+
+                <button class="btn-control" onclick="toggleFullScreen()" title="ملء الشاشة">
+                    <i id="expandIcon" class="fas fa-expand"></i>
+                </button>
+            </div>
             </div>
 
             <audio id="audioPlayer" preload="none"></audio>
