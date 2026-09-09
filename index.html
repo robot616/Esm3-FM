@@ -400,7 +400,6 @@
                         <i id="muteIcon" class="fas fa-volume-up"></i>
                     </button>
                     
-                    <!-- تم تغيير الأمر هنا إلى handleNext والمسمى إلى المحطة القادمة -->
                     <button class="btn-control" onclick="handleNext()" title="المحطة القادمة">
                         <i class="fas fa-step-forward"></i>
                     </button>
@@ -409,7 +408,6 @@
                         <i id="playIcon" class="fas fa-play"></i>
                     </button>
                     
-                    <!-- تم تغيير الأمر هنا إلى handlePrev والمسمى إلى المحطة السابقة -->
                     <button class="btn-control" onclick="handlePrev()" title="المحطة السابقة">
                         <i class="fas fa-step-backward"></i>
                     </button>
@@ -665,6 +663,9 @@
         let nextClickTimer = null;
         let prevClickTimer = null;
 
+        // متغير التتبع اللي بيعرفنا الصفحة واخدة Not Secure ولا لأ
+        let isPageTainted = false;
+
         function initDropdown() {
             Object.keys(radioData).forEach((categoryName) => {
                 const option = document.createElement('option');
@@ -772,41 +773,47 @@
 
         function playStation(station, cardElement, index, specificEpisode = null, isGoingBack = false) {
             
-            // ================== إضافة الذاكرة المؤقتة للـ Refresh ==================
-            // هذا الجزء يعمل فور ضغط المستخدم لحفظ البيانات والقيام بالريفريش أولاً
-            if (!window.isRecoveringState) {
+            // ================== إضافة الهروب من الـ Not Secure ==================
+            let checkUrl = station.url;
+            let tempEpisode = specificEpisode;
+            
+            if (station.isRandom && !tempEpisode) {
+                const epList = station.getList ? station.getList() : [];
+                if (epList.length > 0) {
+                    tempEpisode = epList[Math.floor(Math.random() * epList.length)];
+                }
+            }
+            if (tempEpisode) checkUrl = tempEpisode.url;
+
+            // الريفريش هيحصل "فقط" لو الصفحة حالياً واخدة Not Secure بسبب محطة سابقة
+            if (isPageTainted && !window.isRecoveringState) {
                 let tempHistory = [...randomHistory];
-                let tempEpisode = specificEpisode;
-                
                 if (currentStationIndex !== index && !isGoingBack) {
                     tempHistory = [];
                 }
-                
-                if (station.isRandom && !tempEpisode) {
-                    const epList = station.getList ? station.getList() : [];
-                    if (epList.length > 0) {
-                        tempEpisode = epList[Math.floor(Math.random() * epList.length)];
-                        if (currentEpisodeObj && !isGoingBack) {
-                            tempHistory.push(currentEpisodeObj);
-                        }
-                    }
+                if (station.isRandom && tempEpisode && currentEpisodeObj && !isGoingBack) {
+                    tempHistory.push(currentEpisodeObj);
                 }
 
                 localStorage.setItem('esma3_cat', currentCategoryName);
                 localStorage.setItem('esma3_idx', index);
                 localStorage.setItem('esma3_hist', JSON.stringify(tempHistory));
-                
                 if (tempEpisode) localStorage.setItem('esma3_ep', JSON.stringify(tempEpisode));
                 else localStorage.removeItem('esma3_ep');
                 
                 localStorage.setItem('esma3_triggerPlay', '1');
                 
-                // الريفريش السريع
                 window.location.reload();
-                return; // نوقف الدالة هنا حتى لا يبدأ التشغيل قبل الريفريش
+                return; // مفيش حاجة هتشتغل دلوقتي لأن الريفريش هيتكفل بكل حاجة
             }
-            window.isRecoveringState = false; // إعادة الضبط بعد الاسترجاع الناجح
-            // =====================================================================
+
+            window.isRecoveringState = false;
+
+            // بنعلم الصفحة إنها Not Secure لو المحطة الجديدة اللي هتشتغل بتبدأ بـ http
+            if (checkUrl && checkUrl.startsWith('http://')) {
+                isPageTainted = true;
+            }
+            // ===================================================================
 
             errorMsg.style.display = 'none';
             mainStatusText.textContent = "جاري الاتصال...";
@@ -1027,7 +1034,7 @@
             initDropdown();
             
             if (localStorage.getItem('esma3_triggerPlay') === '1') {
-                localStorage.removeItem('esma3_triggerPlay'); // تنظيف الأمر حتى لا يعلق
+                localStorage.removeItem('esma3_triggerPlay');
                 
                 const savedCat = localStorage.getItem('esma3_cat');
                 const savedIdx = parseInt(localStorage.getItem('esma3_idx'));
@@ -1036,17 +1043,16 @@
 
                 if (savedCat && !isNaN(savedIdx)) {
                     categorySelect.value = savedCat;
-                    loadCategory(savedCat); // ترسم كروت المحطات بناء على القسم المحفوظ
+                    loadCategory(savedCat);
                     
                     randomHistory = savedHist;
-                    window.isRecoveringState = true; // رفع العلم لتخطي كود الحفظ والريفريش داخل الدالة
+                    window.isRecoveringState = true;
                     
                     const stations = radioData[savedCat];
                     if (stations && stations[savedIdx]) {
                         const allCards = document.querySelectorAll('.station-card');
                         const card = allCards[savedIdx] || null;
                         
-                        // تمرير true في النهاية يخدع الكود الأصلي فلا يقوم بمسح History !
                         playStation(stations[savedIdx], card, savedIdx, savedEp, true); 
                     }
                 }
