@@ -400,7 +400,8 @@
                         <i id="muteIcon" class="fas fa-volume-up"></i>
                     </button>
                     
-                    <button class="btn-control" onclick="handlePrev()" title="المحطة السابقة">
+                    <!-- تم تغيير الأمر هنا إلى handleNext والمسمى إلى المحطة القادمة -->
+                    <button class="btn-control" onclick="handleNext()" title="المحطة القادمة">
                         <i class="fas fa-step-forward"></i>
                     </button>
 
@@ -408,7 +409,8 @@
                         <i id="playIcon" class="fas fa-play"></i>
                     </button>
                     
-                    <button class="btn-control" onclick="handleNext()" title="المحطة القادمة">
+                    <!-- تم تغيير الأمر هنا إلى handlePrev والمسمى إلى المحطة السابقة -->
+                    <button class="btn-control" onclick="handlePrev()" title="المحطة السابقة">
                         <i class="fas fa-step-backward"></i>
                     </button>
                     
@@ -556,8 +558,8 @@
             "إسلاميات": [
                 { name: "أذكار الصباح", url: "https://qurango.net/radio/athkar_sabah" },
                 { name: "أذكار المساء", url: "https://qurango.net/radio/athkar_masa" },
-                { name: "إذاعة ابتهالات الشيخ سيد النقشبندي", url: "https://stream.zeno.fm/s0vc98c0pnhvv" },
-                { name: "إذاعة ابتهالات الشيخ نصر الدين طوبار", url: "https://stream.zeno.fm/e15ed2m0pnhvv" },
+                { name: "الشيخ سيد النقشبندي", url: "https://stream.zeno.fm/s0vc98c0pnhvv" },
+                { name: "الشيخ نصر الدين طوبار", url: "https://stream.zeno.fm/e15ed2m0pnhvv" },
                 { name: "السلام إف إم", url: "https://stream-157.zeno.fm/hv3uuw9avuhvv?zt=eyJhbGciOiJIUzI1NiJ9" },
                 { name: "الشيخ الشعراوي", url: "https://stream-175.zeno.fm/guuggdfrvssuv" },
                 { name: "المختصر في تفسير القرآن", url: "https://qurango.net/radio/mukhtasartafsir" },
@@ -776,7 +778,6 @@
                 let tempHistory = [...randomHistory];
                 let tempCurrentEp = currentEpisodeObj;
 
-                // لو غيرنا المحطة تماماً، نفضي الذاكرة القديمة
                 if (currentStationIndex !== index && !isGoingBack) {
                     tempHistory = [];
                     tempCurrentEp = null;
@@ -787,7 +788,7 @@
                     const epList = station.getList ? station.getList() : [];
                     if (epList.length === 0) {
                         alert("تنبيه: لم يتم العثور على الحلقات! تأكد أن ملف podcasts.js موجود في نفس المجلد ومحفوظ بالكود الجديد.");
-                        return; // وقف وماتعملش ريفريش
+                        return; 
                     }
                     if (!epToSave) {
                         const randomIndex = Math.floor(Math.random() * epList.length);
