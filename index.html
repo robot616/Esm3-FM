@@ -756,7 +756,7 @@
             loadCategory(selectedCategory);
         }
 
-        function loadCategory(categoryName) {
+       function loadCategory(categoryName) {
             currentCategoryName = categoryName;
             stationsContainer.innerHTML = '';
 
@@ -768,17 +768,22 @@
                 card.onclick = () => playStation(station, card, index);
                 stationsContainer.appendChild(card);
             });
+            
+            // السطر المضاف لرفع شريط التمرير لأول القائمة عند تغيير القسم
+            stationsContainer.scrollTop = 0;
         }
 
         function handleNext() {
             if (nextClickTimer) {
                 clearTimeout(nextClickTimer);
                 nextClickTimer = null;
-                forceNextStation();
+                // ضغطتين: تغيير الحلقة (بودكاست)
+                playNextStation();
             } else {
                 nextClickTimer = setTimeout(() => {
                     nextClickTimer = null;
-                    playNextStation();
+                    // ضغطة واحدة: تغيير المحطة
+                    forceNextStation();
                 }, 300);
             }
         }
@@ -787,11 +792,13 @@
             if (prevClickTimer) {
                 clearTimeout(prevClickTimer);
                 prevClickTimer = null;
-                forcePrevStation();
+                // ضغطتين: تغيير الحلقة السابقة (بودكاست)
+                playPrevStation();
             } else {
                 prevClickTimer = setTimeout(() => {
                     prevClickTimer = null;
-                    playPrevStation();
+                    // ضغطة واحدة: تغيير المحطة
+                    forcePrevStation();
                 }, 300);
             }
         }
