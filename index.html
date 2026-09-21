@@ -16,7 +16,8 @@
     <script src="https://cdn.jsdelivr.net/npm/hls.js@latest"></script>
     <script src="podcasts.js"></script>
     <script src="boti.js"></script>
-
+    <script src="quran.js"></script>
+    
     <style>
         :root {
             --primary: #00f2fe;
@@ -447,14 +448,15 @@
                 { name: "تلاوات خاشعة", url: "https://stream-172.zeno.fm/bg2j1n5ntltuv?zt=eyJhbGciOiJIUzI1NiJ9" },
                 { name: "تلاوات خاشعة (2)", url: "https://qurango.net/radio/salma" },
                 { name: "سورة البقرة", url: "https://qurango.net/radio/albaqarah" },
-                { name: "سورة الكهف", isRandom: true, getList: () => (typeof window.kahfEpisodes !== 'undefined' ? window.kahfEpisodes : []) },
-                { name: "آيات السكينة", url: "https://qurango.net/radio/sakeenah" },
+                { name: "سورة الكهف", isRandom: true, getList: () => (typeof window.quranKahfEpisodes !== 'undefined' ? window.quranKahfEpisodes : []) },                { name: "آيات السكينة", url: "https://qurango.net/radio/sakeenah" },
                 { name: "مشاري العفاسي", url: "https://qurango.net/radio/mishary_alafasi" },
                 { name: "مشاري العفاسي (2)", url: "https://radio.mp3islam.com/listen/mishary/radio.mp3" },
+                { name: "هيثم الدخين", isRandom: true, getList: () => (typeof window.quranHaithamEpisodes !== 'undefined' ? window.quranHaithamEpisodes : []) },
+                { name: "رعد الكردي", isRandom: true, getList: () => (typeof window.quranRaadEpisodes !== 'undefined' ? window.quranRaadEpisodes : []) },
                 { name: "ماهر المعيقلي", url: "https://qurango.net/radio/maher_al_meaqli" },
                 { name: "ماهر المعيقلي (2)", url: "https://radio.mp3islam.com/listen/maher/radio.mp3" },
-                { name: "إسلام صبحي", url: "https://stream-164.zeno.fm/zorvpgdqfzbuv" },
                 { name: "أحمد العجمي", url: "https://qurango.net/radio/ahmad_alajmy" },
+                { name: "إسلام صبحي", url: "https://stream-164.zeno.fm/zorvpgdqfzbuv" },
                 { name: "أحمد الحواشي", url: "https://qurango.net/radio/ahmad_alhawashi" },
                 { name: "أحمد الطرابلسي", url: "https://qurango.net/radio/ahmed_altrabulsi" },
                 { name: "أحمد الطرابلسي (2)", url: "https://qurango.net/radio/ahmad_khader_altarabulsi" },
