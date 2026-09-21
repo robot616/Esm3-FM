@@ -773,34 +773,60 @@
             stationsContainer.scrollTop = 0;
         }
 
+        let nextClickCount = 0;
         function handleNext() {
-            if (nextClickTimer) {
-                clearTimeout(nextClickTimer);
+            nextClickCount++;
+            if (nextClickTimer) clearTimeout(nextClickTimer);
+            
+            nextClickTimer = setTimeout(() => {
+                let clicks = nextClickCount;
+                nextClickCount = 0;
                 nextClickTimer = null;
-                // ضغطتين: تغيير الحلقة (بودكاست)
-                playNextStation();
-            } else {
-                nextClickTimer = setTimeout(() => {
-                    nextClickTimer = null;
-                    // ضغطة واحدة: تغيير المحطة
+                
+                if (clicks === 1) {
                     forceNextStation();
-                }, 300);
-            }
+                } else if (clicks === 2) {
+                    playNextStation();
+                } else if (clicks >= 3) {
+                    const station = radioData[currentCategoryName][currentStationIndex];
+                    if (station && station.isRandom && station.getList) {
+                        const epList = station.getList();
+                        if (epList.length > 0) {
+                            playStation(station, currentPlayingCard, currentStationIndex, epList[0]);
+                        }
+                    } else {
+                        forceNextStation();
+                    }
+                }
+            }, 400);
         }
 
+        let prevClickCount = 0;
         function handlePrev() {
-            if (prevClickTimer) {
-                clearTimeout(prevClickTimer);
+            prevClickCount++;
+            if (prevClickTimer) clearTimeout(prevClickTimer);
+            
+            prevClickTimer = setTimeout(() => {
+                let clicks = prevClickCount;
+                prevClickCount = 0;
                 prevClickTimer = null;
-                // ضغطتين: تغيير الحلقة السابقة (بودكاست)
-                playPrevStation();
-            } else {
-                prevClickTimer = setTimeout(() => {
-                    prevClickTimer = null;
-                    // ضغطة واحدة: تغيير المحطة
+                
+                if (clicks === 1) {
                     forcePrevStation();
-                }, 300);
-            }
+                } else if (clicks === 2) {
+                    playPrevStation();
+                } else if (clicks >= 3) {
+                    const station = radioData[currentCategoryName][currentStationIndex];
+                    if (station && station.isRandom && station.getList) {
+                        const epList = station.getList();
+                        if (epList.length > 0) {
+                            playStation(station, currentPlayingCard, currentStationIndex, epList[0]);
+                        }
+                    } else {
+                        forcePrevStation();
+                    }
+                }
+            }, 400);
         }
 
         function forceNextStation() {
@@ -1110,6 +1136,32 @@
 
         audioPlayer.addEventListener('error', handleError);
 
+        // ================== إضافة حفظ مكان البودكاست (للكمبيوتر) ==================
+        audioPlayer.addEventListener('timeupdate', () => {
+            // يحفظ التوقيت كل ثانية لو البودكاست شغال وتجاوزنا أول 5 ثواني
+            if (currentEpisodeObj && audioPlayer.currentTime > 5) {
+                localStorage.setItem('esma3_pc_time_' + episodeName.textContent, audioPlayer.currentTime);
+            }
+        });
+
+        audioPlayer.addEventListener('canplay', () => {
+            // يسترجع التوقيت فور بدء الحلقة
+            if (currentEpisodeObj) {
+                const savedTime = localStorage.getItem('esma3_pc_time_' + episodeName.textContent);
+                if (savedTime && audioPlayer.currentTime < 2) {
+                    audioPlayer.currentTime = parseFloat(savedTime);
+                }
+            }
+        });
+
+        audioPlayer.addEventListener('ended', () => {
+            // يمسح التوقيت المحفوظ لما الحلقة تخلص خالص عشان تبدأ من الأول المرة الجاية
+            if (currentEpisodeObj) {
+                localStorage.removeItem('esma3_pc_time_' + episodeName.textContent);
+            }
+        });
+        // ==========================================================================
+        
         // ================== إضافة قراءة الذاكرة المؤقتة للـ Refresh ==================
         window.onload = function() {
             initDropdown();
