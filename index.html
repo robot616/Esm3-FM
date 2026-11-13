@@ -786,6 +786,33 @@
         // متغير التتبع اللي بيعرفنا الصفحة واخدة Not Secure ولا لأ
         let isPageTainted = false;
 
+        // ================== منع تكرار الحلقات العشوائية لحد ما كل الحلقات تخلص ==================
+        // بيحفظ لكل بودكاست روابط الحلقات اللي اشتغلت في الدورة الحالية
+        let playedEpisodes = {};
+
+        function markEpisodePlayed(stationName, ep) {
+            if (!ep) return;
+            if (!playedEpisodes[stationName]) playedEpisodes[stationName] = [];
+            if (!playedEpisodes[stationName].includes(ep.url)) playedEpisodes[stationName].push(ep.url);
+        }
+
+        function pickRandomEpisode(stationName, epList, avoidUrl) {
+            if (!playedEpisodes[stationName]) playedEpisodes[stationName] = [];
+            let remaining = epList.filter(ep => !playedEpisodes[stationName].includes(ep.url));
+
+            // لو كل الحلقات خلصت نبدأ دورة جديدة (مع تجنب تكرار الحلقة الأخيرة على طول)
+            if (remaining.length === 0) {
+                playedEpisodes[stationName] = [];
+                remaining = epList.filter(ep => ep.url !== avoidUrl);
+                if (remaining.length === 0) remaining = epList;
+            }
+
+            const ep = remaining[Math.floor(Math.random() * remaining.length)];
+            markEpisodePlayed(stationName, ep);
+            return ep;
+        }
+        // ========================================================================================
+
         function initDropdown() {
             Object.keys(radioData).forEach((categoryName) => {
                 const option = document.createElement('option');
@@ -933,7 +960,7 @@
             if (station.isRandom && !tempEpisode) {
                 const epList = station.getList ? station.getList() : [];
                 if (epList.length > 0) {
-                    tempEpisode = epList[Math.floor(Math.random() * epList.length)];
+                    tempEpisode = pickRandomEpisode(station.name, epList, currentEpisodeObj ? currentEpisodeObj.url : null);
                 }
             }
             if (tempEpisode) checkUrl = tempEpisode.url;
@@ -951,6 +978,7 @@
                 localStorage.setItem('esma3_cat', currentCategoryName);
                 localStorage.setItem('esma3_idx', index);
                 localStorage.setItem('esma3_hist', JSON.stringify(tempHistory));
+                localStorage.setItem('esma3_played', JSON.stringify(playedEpisodes));
                 if (tempEpisode) localStorage.setItem('esma3_ep', JSON.stringify(tempEpisode));
                 else localStorage.removeItem('esma3_ep');
                 
@@ -1009,13 +1037,15 @@
                 let episodeToPlay = specificEpisode;
 
                 if (!episodeToPlay) {
-                    const randomIndex = Math.floor(Math.random() * epList.length);
-                    episodeToPlay = epList[randomIndex];
+                    // الحلقة اتختارت فوق (بدون تكرار) في tempEpisode
+                    episodeToPlay = tempEpisode || pickRandomEpisode(station.name, epList, null);
                     
                     if (currentEpisodeObj && !isGoingBack) {
                         randomHistory.push(currentEpisodeObj);
                     }
                 }
+
+                markEpisodePlayed(station.name, episodeToPlay);
 
                 currentEpisodeObj = episodeToPlay;
                 targetUrl = episodeToPlay.url;
@@ -1219,6 +1249,7 @@
                 const savedIdx = parseInt(localStorage.getItem('esma3_idx'));
                 const savedHist = JSON.parse(localStorage.getItem('esma3_hist') || '[]');
                 const savedEp = localStorage.getItem('esma3_ep') ? JSON.parse(localStorage.getItem('esma3_ep')) : null;
+                playedEpisodes = JSON.parse(localStorage.getItem('esma3_played') || '{}');
 
                 if (savedCat && !isNaN(savedIdx)) {
                     categorySelect.value = savedCat;
