@@ -217,6 +217,8 @@ window.memoryJourneyEpisodes = [
 ];
 
 window.daheehEpisodes = [
+    { name: "كيف قرأت الحضارات القديمة السماء؟", url: "https://res.cloudinary.com/xugyuedz/video/upload/v1795059723/stars.mp3" },
+    { name: "الإنكشارية", url: "https://res.cloudinary.com/xugyuedz/video/upload/v1795059059/Janissary.mp3" },
     { name: "صُنع في الصين", url: "https://res.cloudinary.com/xugyuedz/video/upload/v1794273346/china.mp3" },
     { name: "سيد الخواتم: حين يكون الرفض هو البطولة", url: "https://res.cloudinary.com/xugyuedz/video/upload/v1794273344/rings.mp3" },
     { name: "كيف تعاقب أمريكا العالم؟", url: "https://res.cloudinary.com/xugyuedz/video/upload/v1793671923/3oqbat.mp3" },
